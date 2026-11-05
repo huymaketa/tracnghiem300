@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thi Ma-thi-ơ · Bị chấm bằng bút đỏ</title>
+<meta name="description" content="Mỗi lượt vào thi là một đề 30 câu ngẫu nhiên từ đề cương 300 câu Ma-thi-ơ. Đúng sai báo ngay, kèm vài câu cà khịa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3f5f9;
+  --sheet:#ffffff;
+  --rule:#d9e1ee;
+  --ink:#1a2745;
+  --ink-soft:#56627d;
+  --red:#d7263d;
+  --red-bg:#fde8eb;
+  --green:#14804f;
+  --green-bg:#e3f5ec;
+  --hi:#ffe45e;
+  --shadow:0 1px 0 rgba(26,39,69,.06),0 10px 30px -12px rgba(26,39,69,.25);
+  --font-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-pen:"Caveat","Bradley Hand","Segoe Print",cursive;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#10162a;--sheet:#182040;--rule:#2a3560;--ink:#e8ecf8;--ink-soft:#9aa6c7;
+    --red:#ff5d73;--red-bg:#3a1b27;--green:#3ddc97;--green-bg:#12352a;--hi:#8a7a1a;
+    --shadow:0 1px 0 rgba(0,0,0,.3),0 10px 30px -12px rgba(0,0,0,.6);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;background:var(--paper);color:var(--ink);
+  font-family:var(--font-ui);font-size:17px;line-height:1.55;
+  padding:20px 16px 56px;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px;border-radius:6px}
+.wrap{max-width:660px;margin:0 auto}
+
+/* sheet: lined exam paper with red margin */
+.sheet{
+  position:relative;background:var(--sheet);border-radius:6px;box-shadow:var(--shadow);
+  padding:26px 22px 26px 58px;
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px);
+  background-size:100% 32px;background-position:0 10px;
+}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--red);opacity:.55}
+.sheet>*{position:relative}
+
+h1,h2{font-weight:700;line-height:1.2;margin:0}
+.title{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em;background:var(--sheet);display:inline;padding:0 6px 0 0;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.sub{margin:10px 0 0;color:var(--ink-soft);background:var(--sheet);display:inline-block;padding-right:6px}
+.pen{font-family:var(--font-pen);font-weight:700;color:var(--red);line-height:1.15}
+
+/* top bar */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.who{font-size:14px;color:var(--ink-soft)}
+.who b{color:var(--ink)}
+.iconbtn{border:1px solid var(--rule);background:var(--sheet);border-radius:999px;padding:6px 12px;font-size:14px}
+.iconbtn:hover{border-color:var(--ink-soft)}
+
+/* login */
+.field{display:block;margin:28px 0 14px;background:var(--sheet);padding:2px 6px 2px 0}
+.field span{display:block;font-weight:600;margin-bottom:6px}
+.field input{
+  width:100%;font:inherit;font-size:19px;padding:12px 14px;border:2px solid var(--ink);border-radius:8px;
+  background:var(--sheet);color:var(--ink);
+}
+.field input::placeholder{color:var(--ink-soft)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:2px solid var(--ink);background:var(--ink);color:var(--sheet);
+  padding:12px 22px;border-radius:8px;font-weight:600;font-size:17px;
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--red)}
+.btn:active{transform:none;box-shadow:none}
+.btn.ghost{background:var(--sheet);color:var(--ink)}
+.rules{margin:26px 0 0;padding:0;list-style:none;background:var(--sheet);display:inline-block;padding-right:8px;color:var(--ink-soft);font-size:15px}
+.rules li{margin:2px 0}
+
+/* progress: 30 score boxes */
+.score-row{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin:0 0 18px;background:var(--sheet);padding:4px 6px 4px 0}
+.cell{aspect-ratio:1;border:1.5px solid var(--rule);border-radius:4px;display:grid;place-items:center;font-size:12px;font-weight:700;line-height:1}
+.cell.now{border-color:var(--ink);box-shadow:0 0 0 2px var(--hi)}
+.cell.ok{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.cell.no{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+
+/* question */
+.meta{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--ink-soft);margin-bottom:8px;background:var(--sheet);padding:2px 6px 2px 0}
+.q{font-size:clamp(19px,4.4vw,22px);font-weight:600;line-height:1.45;margin:0 0 18px;background:var(--sheet);padding:2px 6px 2px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.opts{display:grid;gap:10px}
+.opt{
+  display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;text-align:left;
+  width:100%;padding:12px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--sheet);
+  transition:transform .12s ease,background .12s ease,border-color .12s ease;
+}
+.opt .key{
+  width:30px;height:30px;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;
+  font-weight:700;font-size:14px;margin-top:1px;
+}
+.opt:hover:not(:disabled){transform:translateX(3px);background:color-mix(in srgb,var(--hi) 35%,var(--sheet))}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.opt.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red);text-decoration:line-through;text-decoration-thickness:2px}
+.opt.dim{opacity:.55}
+.opt .t{color:var(--ink)}
+.opt.right .t,.opt.wrong .t{color:inherit}
+
+/* feedback */
+.fb{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:var(--sheet);padding:12px 8px 12px 0}
+.fb[hidden]{display:none}
+.stamp{
+  font-family:var(--font-pen);font-weight:700;font-size:44px;line-height:1;
+  border:4px solid currentColor;border-radius:10px;padding:4px 14px 8px;transform:rotate(-7deg);
+  animation:stamp .28s cubic-bezier(.2,1.6,.4,1) both;
+}
+.stamp.ok{color:var(--green)}
+.stamp.no{color:var(--red)}
+@keyframes stamp{from{transform:rotate(-7deg) scale(2.2);opacity:0}to{transform:rotate(-7deg) scale(1);opacity:1}}
+.note{font-size:clamp(23px,5vw,28px)}
+.ref{grid-column:1/-1;font-size:14px;color:var(--ink-soft);border-top:1px dashed var(--rule);padding-top:8px}
+.next{margin-top:14px;display:flex;justify-content:flex-end;background:var(--sheet);padding:4px 6px 4px 0}
+
+/* result */
+.grade{display:flex;align-items:center;gap:20px;margin:6px 0 4px;background:var(--sheet);padding:6px 8px 6px 0;flex-wrap:wrap}
+.big{font-size:clamp(64px,18vw,92px);font-weight:700;letter-spacing:-.04em;line-height:1}
+.big small{font-size:.38em;color:var(--ink-soft);font-weight:600;letter-spacing:0}
+.verdict{font-size:clamp(26px,6vw,34px)}
+.roast{margin:8px 0 18px;font-size:18px;background:var(--sheet);display:inline;padding:0 6px 0 0;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0;background:var(--sheet);padding:4px 8px 4px 0}
+details.review{background:var(--sheet);padding:8px 8px 8px 0;margin-top:6px}
+details.review summary{cursor:pointer;font-weight:600}
+.rv{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.rv li{border-left:4px solid var(--red);padding:2px 0 2px 12px;font-size:15px}
+.rv .ans{color:var(--green);font-weight:600}
+
+/* effects */
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:40;background:radial-gradient(circle,transparent 35%,rgba(215,38,61,.45));animation:flash .5s ease-out both}
+@keyframes flash{from{opacity:1}to{opacity:0}}
+body.shake .wrap{animation:shake .45s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.rain{position:fixed;top:-40px;z-index:45;pointer-events:none;font-size:30px;animation:fall 1.7s ease-in forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(260deg);opacity:.9}}
+
+@media (max-width:480px){
+  .sheet{padding:20px 14px 22px 40px}
+  .sheet::before{left:26px}
+  .score-row{grid-template-columns:repeat(10,1fr)}
+  .fb{grid-template-columns:1fr}
+  .stamp{justify-self:start}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="bar">
+    <div class="who" id="who"></div>
+    <button class="iconbtn" id="snd" type="button" aria-pressed="true">Âm thanh: bật</button>
+  </div>
+  <main class="sheet" id="app" aria-live="polite"></main>
+</div>
+
+<script>
+"use strict";
+const Q = [{"n":1,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Trước khi được Chúa Giê-xu kêu gọi làm môn đồ, tác giả sách Tin Lành Ma-thi-ơ làm nghề gì?","o":["Thu thuế","Đánh cá","Thầy thuốc","Thợ mộc"],"a":0,"r":"Ma-thi-ơ 9:9; 10:3. Đánh cá là nghề của Phi-e-rơ và Anh-rê; thầy thuốc là nghề của Lu-ca."},{"n":2,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Ma-thi-ơ còn có tên khác là gì?","o":["Gia-cơ","Lê-vi","Ba-na-ba","Ti-mô-thê"],"a":1,"r":"Mác 2:14; Lu-ca 5:27. Tên “Lê-vi” chỉ có trong Mác và Lu-ca, không có trong chính sách Ma-thi-ơ."},{"n":3,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Sách Tin Lành Ma-thi-ơ được viết gởi cho nhóm độc giả chính là:","o":["Người Hy Lạp","Người La-mã","Người Do Thái","Người Sa-ma-ri"],"a":2,"r":"Toàn sách. Sách trích Cựu Ước rất nhiều và mở đầu bằng gia phả từ Áp-ra-ham, Đa-vít."},{"n":4,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Sách Ma-thi-ơ gồm bao nhiêu chương?","o":["21","24","28","16"],"a":2,"r":"Toàn sách. 24 là số chương sách Lu-ca; 21 là số chương sách Giăng."},{"n":5,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Ma-thi-ơ là sách thứ mấy trong Tân Ước?","o":["Thứ nhất","Thứ tư","Thứ hai","Thứ ba"],"a":0,"r":"Toàn sách. Thứ tự bốn sách Tin Lành: Ma-thi-ơ, Mác, Lu-ca, Giăng."},{"n":6,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Sách Ma-thi-ơ ghi lại mấy bài giảng lớn của Chúa Giê-xu?","o":["Bảy","Năm","Ba","Chín"],"a":1,"r":"5–7; 10; 13; 18; 24–25. Mỗi bài thường kết thúc bằng “Khi Chúa Giê-xu phán xong những lời ấy” (7:28; 11:1; 13:53; 19:1; 26:1)."},{"n":7,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Trong Ma-thi-ơ, Chúa Giê-xu được nhấn mạnh trước hết là:","o":["Vua và Đấng Mê-si-a của dân Do Thái","Đầy tớ chịu khổ","Con Người hoàn hảo","Thầy tế lễ thượng phẩm đời đời"],"a":0,"r":"Toàn sách. Theo cách tóm tắt quen thuộc: Ma-thi-ơ là Vua, Mác là Đầy tớ, Lu-ca là Con Người, Giăng là Con Đức Chúa Trời."},{"n":8,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Cụm từ nào là đặc trưng, xuất hiện rất nhiều lần trong sách Ma-thi-ơ?","o":["Ngôi Lời","Nước thiên đàng","Ta là bánh sự sống","Ta là sự sống lại và sự sống"],"a":1,"r":"Toàn sách. Hai cụm còn lại là của sách Giăng."},{"n":9,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Ma-thi-ơ thường dùng cụm nào khi trích lời tiên tri Cựu Ước?","o":["Hãy nghe, hỡi Y-sơ-ra-ên","Thật, thật, Ta nói cùng các ngươi","Để ứng nghiệm lời Chúa đã phán qua đấng tiên tri","Theo lời truyền khẩu của các trưởng lão"],"a":2,"r":"1:22; 2:15; 2:17; 2:23. Nhấn mạnh Chúa Giê-xu là Đấng Mê-si-a được hứa."},{"n":10,"ch":"TỔNG QUAN SÁCH MA-THI-Ơ","q":"Gia phả trong Ma-thi-ơ bắt đầu từ:","o":["Nô-ê","Áp-ra-ham","A-đam","Môi-se"],"a":1,"r":"1:1-2. Gia phả trong Lu-ca đi ngược lên đến A-đam."},{"n":11,"ch":"CHƯƠNG 1","q":"Ma-thi-ơ 1:1 gọi Chúa Giê-xu là con cháu của hai người nào?","o":["Đa-vít và Áp-ra-ham","Áp-ra-ham và Gia-cốp","Môi-se và Đa-vít","Y-sác và Gia-cốp"],"a":0,"r":"1:1. Hai lời hứa lớn: giao ước với Áp-ra-ham và ngôi vua của Đa-vít."},{"n":12,"ch":"CHƯƠNG 1","q":"Gia phả Chúa Giê-xu được chia thành ba nhóm; mỗi nhóm có bao nhiêu đời?","o":["Hai mươi tám đời","Mười hai đời","Mười bốn đời","Bảy đời"],"a":2,"r":"1:17. Ba nhóm: từ Áp-ra-ham đến Đa-vít, từ Đa-vít đến lúc bị đày, từ lúc bị đày đến Đấng Christ."},{"n":13,"ch":"CHƯƠNG 1","q":"Hai mốc nào dùng để chia gia phả ở Ma-thi-ơ 1:17?","o":["Đa-vít và việc bị đày sang Ba-by-lôn","Môi-se và Giô-suê","Sa-lô-môn và Hê-rốt","A-đam và Nô-ê"],"a":0,"r":"1:17"},{"n":14,"ch":"CHƯƠNG 1","q":"Người phụ nữ nào dưới đây có tên trong gia phả Chúa Giê-xu ở Ma-thi-ơ 1?","o":["Ê-xơ-tê","Ru-tơ","Đê-bô-ra","Ê-li-sa-bét"],"a":1,"r":"1:5. Gia phả còn nhắc Ta-ma, Ra-háp và vợ của U-ri."},{"n":15,"ch":"CHƯƠNG 1","q":"Khi biết Ma-ri có thai, Giô-sép là người công chính nên định làm gì?","o":["Cưới nàng ngay lập tức","Tố cáo nàng trước công chúng","Âm thầm bỏ nàng","Đem nàng đến thầy tế lễ để xét xử"],"a":2,"r":"1:19. Ông không muốn làm nhục nàng."},{"n":16,"ch":"CHƯƠNG 1","q":"Thiên sứ báo cho Giô-sép đừng sợ rước Ma-ri về nhà bằng cách nào?","o":["Phán từ đám mây","Hiện ra giữa ban ngày","Hiện đến trong chiêm bao","Qua lời một thầy tế lễ"],"a":2,"r":"1:20. Giô-sép được nhắc là “con vua Đa-vít”."},{"n":17,"ch":"CHƯƠNG 1","q":"Vì sao thiên sứ truyền đặt tên con trẻ là Giê-xu?","o":["Vì Ngài sẽ ngồi trên ngai Đa-vít","Vì Ngài sẽ cứu dân mình ra khỏi tội","Vì Ngài sẽ giải phóng dân khỏi La-mã","Vì Ngài sẽ xây lại đền thờ"],"a":1,"r":"1:21. Tên Giê-xu có nghĩa là “Đức Giê-hô-va cứu rỗi”."},{"n":18,"ch":"CHƯƠNG 1","q":"Lời “Nầy, một nữ đồng trinh sẽ chịu thai…” do tiên tri nào nói?","o":["Ê-sai","Mi-chê","Giê-rê-mi","Đa-ni-ên"],"a":0,"r":"1:22-23. Em-ma-nu-ên nghĩa là Đức Chúa Trời ở cùng chúng ta."},{"n":19,"ch":"CHƯƠNG 2","q":"Chúa Giê-xu giáng sinh tại Bết-lê-hem trong đời vua nào?","o":["Hê-rốt","Ti-be-rơ","Nê-bu-cát-nết-sa","Phi-lát"],"a":0,"r":"2:1"},{"n":20,"ch":"CHƯƠNG 2","q":"Các nhà thông thái đến Giê-ru-sa-lem từ phương nào?","o":["Phương Nam","Phương Đông","Phương Bắc","Phương Tây"],"a":1,"r":"2:1"},{"n":21,"ch":"CHƯƠNG 2","q":"Các nhà thông thái nói họ đã thấy điều gì ở phương Đông?","o":["Thiên sứ hiện ra","Đám mây sáng trên đền thờ","Ngôi sao của Vua dân Giu-đa","Một đám lửa trên núi"],"a":2,"r":"2:2. Họ đến để thờ lạy Ngài."},{"n":22,"ch":"CHƯƠNG 2","q":"Ba lễ vật các nhà thông thái dâng cho Chúa Giê-xu là gì?","o":["Vàng, nhũ hương, một dược","Vàng, bạc, nhũ hương","Vàng, một dược, dầu thơm","Vàng, ngọc, nhũ hương"],"a":0,"r":"2:11. Kinh Thánh không nói rõ có bao nhiêu nhà thông thái."},{"n":23,"ch":"CHƯƠNG 2","q":"Vì sao các nhà thông thái về xứ mình bằng đường khác?","o":["Ngôi sao biến mất","Được báo trong chiêm bao đừng trở lại gặp Hê-rốt","Bị lính La-mã ngăn cản","Hê-rốt đã dặn họ đi đường khác"],"a":1,"r":"2:12"},{"n":24,"ch":"CHƯƠNG 2","q":"Để tránh Hê-rốt, gia đình Giô-sép chạy trốn sang:","o":["Sy-ri","Ba-by-lôn","Ai Cập","La-mã"],"a":2,"r":"2:13-14. Ứng nghiệm: “Ta đã gọi con trai Ta ra khỏi Ai Cập” (2:15)."},{"n":25,"ch":"CHƯƠNG 2","q":"Hê-rốt ra lệnh giết các bé trai ở Bết-lê-hem từ bao nhiêu tuổi trở xuống?","o":["Hai tuổi","Một tuổi","Ba tuổi","Bốn tuổi"],"a":0,"r":"2:16"},{"n":26,"ch":"CHƯƠNG 2","q":"Sau khi Hê-rốt chết, gia đình Giô-sép trở về ở thành nào ở Ga-li-lê?","o":["Ca-bê-na-um","Na-xa-rét","Bết-lê-hem","Ti-bê-ri-a"],"a":1,"r":"2:19-23"},{"n":27,"ch":"CHƯƠNG 3","q":"Giăng Báp-tít rao giảng ở đâu?","o":["Bờ biển Ga-li-lê","Trong đền thờ Giê-ru-sa-lem","Đồng vắng xứ Giu-đê","Trong thành Giê-ri-cô"],"a":2,"r":"3:1"},{"n":28,"ch":"CHƯƠNG 3","q":"Áo của Giăng Báp-tít được làm bằng gì?","o":["Da chiên","Lông lạc đà","Vải gai mịn","Lông chiên"],"a":1,"r":"3:4. Ông thắt dây lưng da."},{"n":29,"ch":"CHƯƠNG 3","q":"Thức ăn của Giăng Báp-tít là gì?","o":["Châu chấu và mật ong rừng","Bánh và cá","Trái vả và nho","Bánh không men và cá khô"],"a":0,"r":"3:4"},{"n":30,"ch":"CHƯƠNG 3","q":"Giăng gọi những người Pha-ri-si và Sa-đu-sê đến chịu phép báp-tem là gì?","o":["Kẻ giả hình","Con cái sự sáng","Dòng dõi rắn lục","Con cái Áp-ra-ham"],"a":2,"r":"3:7"},{"n":31,"ch":"CHƯƠNG 3","q":"Giăng nói Đấng đến sau mình sẽ làm báp-tem bằng gì?","o":["Đức Thánh Linh và lửa","Dầu và nước","Nước và Lời","Bằng đức tin và sự ăn năn"],"a":0,"r":"3:11"},{"n":32,"ch":"CHƯƠNG 3","q":"Ai làm phép báp-tem cho Chúa Giê-xu ở sông Giô-đanh?","o":["Gia-cơ","Giăng Báp-tít","Phi-e-rơ","Anh-rê"],"a":1,"r":"3:13-16"},{"n":33,"ch":"CHƯƠNG 3","q":"Khi Chúa chịu báp-tem, có tiếng từ trời phán điều gì?","o":["“Con là Đấng Mê-si-a”","“Hãy nghe lời Con Ta”","“Nầy là Con yêu dấu của Ta, đẹp lòng Ta mọi đàng”","“Ngươi là thầy tế lễ đời đời”"],"a":2,"r":"3:16-17. Đức Thánh Linh ngự xuống như chim bồ câu."},{"n":34,"ch":"CHƯƠNG 4","q":"Ai đem Chúa Giê-xu vào đồng vắng để chịu ma quỷ cám dỗ?","o":["Giăng Báp-tít","Một thiên sứ","Đức Thánh Linh","Ê-li"],"a":2,"r":"4:1. Chúa kiêng ăn bốn mươi ngày bốn mươi đêm."},{"n":35,"ch":"CHƯƠNG 4","q":"Khi ma quỷ bảo biến đá thành bánh, Chúa Giê-xu đáp bằng cách nào?","o":["Im lặng","Trích Kinh Thánh: “Người ta sống không phải chỉ nhờ bánh”","Biến đá thành bánh","Nhờ thiên sứ đem bánh đến"],"a":1,"r":"4:3-4. Cả ba lần Chúa đều đáp: “Có lời chép rằng”."},{"n":36,"ch":"CHƯƠNG 4","q":"Ma quỷ bảo Chúa nhảy từ đâu xuống?","o":["Nóc đền thờ","Tường thành Giê-ru-sa-lem","Đỉnh núi Ô-li-ve","Đỉnh núi Si-nai"],"a":0,"r":"4:5-6"},{"n":37,"ch":"CHƯƠNG 4","q":"Ma quỷ hứa ban gì nếu Chúa quỳ lạy nó?","o":["Ngai Đa-vít","Mọi nước trên thế gian và sự vinh hiển","Của cải trong đền thờ","Quyền xét đoán muôn dân"],"a":1,"r":"4:8-9. Chúa đáp: “Hỡi Sa-tan, hãy lui ra!”"},{"n":38,"ch":"CHƯƠNG 4","q":"Sau khi Giăng bị bắt, Chúa Giê-xu dọn đến ở thành nào?","o":["Ca-bê-na-um","Na-xa-rét","Bết-sai-đa","Giê-ru-sa-lem"],"a":0,"r":"4:12-13"},{"n":39,"ch":"CHƯƠNG 4","q":"Chúa gọi hai anh em nào đang thả lưới trên biển Ga-li-lê?","o":["Phi-líp và Na-tha-na-ên","Gia-cơ và Giăng","Si-môn Phi-e-rơ và Anh-rê","Phi-líp và Ba-thê-lê-my"],"a":2,"r":"4:18-19. “Ta sẽ khiến các ngươi trở nên tay đánh lưới người.”"},{"n":40,"ch":"CHƯƠNG 4","q":"Gia-cơ và Giăng, con Xê-bê-đê, đang làm gì khi Chúa gọi?","o":["Vá lưới trong thuyền với cha","Bán cá ở chợ","Thả lưới ngoài khơi","Đang giảng dạy trong nhà hội"],"a":0,"r":"4:21"},{"n":41,"ch":"CHƯƠNG 4","q":"Chúa Giê-xu bắt đầu rao giảng điều gì?","o":["Hãy giữ luật pháp Môi-se","Hãy ăn năn, vì nước thiên đàng đã đến gần","Hãy tin, vì Đấng Mê-si-a đã đến","Hãy chịu báp-tem, vì nước thiên đàng đã gần"],"a":1,"r":"4:17"},{"n":42,"ch":"CHƯƠNG 4","q":"Chúa Giê-xu đi khắp xứ nào để dạy dỗ, rao tin lành và chữa bệnh?","o":["Sa-ma-ri","Giu-đê","Ga-li-lê","Y-đu-mê"],"a":2,"r":"4:23"},{"n":43,"ch":"CHƯƠNG 5","q":"“Phước cho những người hiền lành, vì sẽ…”","o":["Được đất làm cơ nghiệp","Được yên ủi","Được no đủ","Được ở trong đền thờ"],"a":0,"r":"5:5"},{"n":44,"ch":"CHƯƠNG 5","q":"“Phước cho những kẻ có lòng thương xót, vì sẽ…”","o":["Thấy Đức Chúa Trời","Được thương xót","Được gọi là con Đức Chúa Trời","Được yên ủi"],"a":1,"r":"5:7"},{"n":45,"ch":"CHƯƠNG 5","q":"“Phước cho những kẻ có lòng thanh sạch, vì sẽ…”","o":["Được đất làm cơ nghiệp","Được thương xót","Thấy Đức Chúa Trời","Được gọi là con Đức Chúa Trời"],"a":2,"r":"5:8"},{"n":46,"ch":"CHƯƠNG 5","q":"“Phước cho những kẻ làm cho người hòa thuận, vì sẽ…”","o":["Được gọi là con Đức Chúa Trời","Được no đủ","Được thương xót","Được yên ủi"],"a":0,"r":"5:9"},{"n":47,"ch":"CHƯƠNG 5","q":"“Phước cho những kẻ có tâm hồn nghèo khó, vì…”","o":["Họ sẽ được yên ủi","Nước thiên đàng là của những kẻ ấy","Họ sẽ được đất làm cơ nghiệp","Họ sẽ thấy Đức Chúa Trời"],"a":1,"r":"5:3"},{"n":48,"ch":"CHƯƠNG 5","q":"Chúa Giê-xu phán nếu muối mất mặn thì:","o":["Được làm cho mặn lại","Được trộn vào đất","Chỉ bị quăng ra ngoài cho người ta giày đạp","Được đem dâng trong đền thờ"],"a":2,"r":"5:13"},{"n":49,"ch":"CHƯƠNG 5","q":"Người ta thắp đèn rồi đặt ở đâu?","o":["Trong hầm","Trên chân đèn","Dưới cái thùng","Trên bàn thờ"],"a":1,"r":"5:15. Đèn soi sáng mọi người trong nhà."},{"n":50,"ch":"CHƯƠNG 5","q":"Khi đang dâng của lễ mà nhớ anh em có điều phiền trách mình, Chúa dạy phải làm gì?","o":["Để của lễ lại, đi làm hòa với anh em trước","Dâng xong rồi mới đi","Dâng gấp đôi","Hỏi ý kiến thầy tế lễ trước"],"a":0,"r":"5:23-24"},{"n":51,"ch":"CHƯƠNG 5","q":"Chúa phán người nhìn đàn bà mà động tình dục thì:","o":["Phải dâng của lễ chuộc tội","Chỉ có tội nếu hành động","Trong lòng đã phạm tội tà dâm với nàng","Chỉ phạm tội nếu có người làm chứng"],"a":2,"r":"5:28"},{"n":52,"ch":"CHƯƠNG 5","q":"Về việc thề thốt, Chúa dạy:","o":["Thề nhân danh Giê-ru-sa-lem","Thề nhân danh đền thờ","Đừng thề chi cả; “có” thì nói “có”, “không” thì nói “không”","Thề chỉ nhân danh trời"],"a":2,"r":"5:34-37"},{"n":53,"ch":"CHƯƠNG 5","q":"Nếu ai vả má bên phải, Chúa dạy hãy:","o":["Đưa luôn má bên kia","Kiện người ấy","Vả lại","Chạy trốn"],"a":0,"r":"5:39"},{"n":54,"ch":"CHƯƠNG 5","q":"Nếu ai bắt mình đi một dặm, Chúa dạy hãy:","o":["Đi ba dặm","Đi với họ hai dặm","Từ chối","Đi nửa dặm"],"a":1,"r":"5:41"},{"n":55,"ch":"CHƯƠNG 5","q":"Chúa dạy môn đồ đối với kẻ thù nghịch phải:","o":["Yêu thương và cầu nguyện cho họ","Tránh xa họ","Báo trả tương xứng","Đuổi họ ra khỏi hội"],"a":0,"r":"5:44"},{"n":56,"ch":"CHƯƠNG 5","q":"Chúa dạy môn đồ hãy nên trọn vẹn như ai?","o":["Môi-se","Các thầy thông giáo","Cha ở trên trời","Phi-e-rơ"],"a":2,"r":"5:48"},{"n":57,"ch":"CHƯƠNG 6","q":"Khi bố thí, Chúa dạy đừng để ___ biết việc ___ làm.","o":["Anh em, bạn hữu","Tay trái, tay phải","Thầy tế lễ, người nghèo","Người nghèo, kẻ giàu"],"a":1,"r":"6:3"},{"n":58,"ch":"CHƯƠNG 6","q":"Khi cầu nguyện, Chúa dạy hãy:","o":["Cầu nguyện thật to tiếng","Đứng nơi ngã tư để mọi người thấy","Vào phòng riêng, đóng cửa lại và cầu nguyện Cha nơi kín nhiệm","Cầu nguyện trong nhà hội, đứng giữa người ta"],"a":2,"r":"6:5-6"},{"n":59,"ch":"CHƯƠNG 6","q":"Trong lời cầu nguyện Chúa dạy, môn đồ xin điều gì cho “ngày nay”?","o":["Lương thực đủ dùng hằng ngày","Của cải dư dật","Sự bình an","Sự sống đời đời"],"a":0,"r":"6:11"},{"n":60,"ch":"CHƯƠNG 6","q":"Chúa phán nếu các ngươi tha lỗi cho người khác thì:","o":["Được sống đời đời","Cha trên trời cũng sẽ tha thứ cho các ngươi","Được thêm phước nhiều","Được vào đền thờ"],"a":1,"r":"6:14"},{"n":61,"ch":"CHƯƠNG 6","q":"Chúa dạy môn đồ chất chứa của cải ở đâu?","o":["Dưới đất","Trong ngân hàng của đền thờ","Trên trời","Trong kho thóc"],"a":2,"r":"6:19-20. Dưới đất có mối mọt, sét làm hư và kẻ trộm khoét vách."},{"n":62,"ch":"CHƯƠNG 6","q":"“Vì kho tàng ngươi ở đâu thì…”","o":["Sự bình an ngươi cũng ở đó","Lòng ngươi cũng ở đó","Phước ngươi cũng ở đó","Của cải ngươi cũng ở đó"],"a":1,"r":"6:21"},{"n":63,"ch":"CHƯƠNG 6","q":"Chúa phán: “Các ngươi không thể làm tôi Đức Chúa Trời, lại làm tôi ___ được.”","o":["Ma-môn (tiền của)","Ba-anh","Sa-tan","Hê-rốt"],"a":0,"r":"6:24"},{"n":64,"ch":"CHƯƠNG 6","q":"Chúa nói người nào, dù cả sự vinh hiển cũng không mặc đẹp bằng một đóa hoa huệ ngoài đồng?","o":["Gia-cốp","Sa-lô-môn","Đa-vít","Ê-li"],"a":1,"r":"6:29"},{"n":65,"ch":"CHƯƠNG 6","q":"“Hãy tìm kiếm trước hết ___ và sự công bình của Ngài.”","o":["Nước Đức Chúa Trời","Sự bình an","Của cải đời nầy","Sự khôn ngoan"],"a":0,"r":"6:33"},{"n":66,"ch":"CHƯƠNG 7","q":"Chúa phán người xét đoán anh em thấy cái rác trong mắt anh em mà không thấy cái gì trong mắt mình?","o":["Hạt cát","Giọt lệ","Cây đà","Cục than"],"a":2,"r":"7:3-5"},{"n":67,"ch":"CHƯƠNG 7","q":"Chúa dạy đừng quăng châu ngọc mình trước mặt loài nào?","o":["Heo","Chiên","Chim","Quạ"],"a":0,"r":"7:6"},{"n":68,"ch":"CHƯƠNG 7","q":"Nếu con xin bánh, người cha nào lại đưa cho nó:","o":["Cây gậy","Hòn đá","Bánh mốc","Con rắn"],"a":1,"r":"7:9. Cha trên trời càng ban điều tốt cho kẻ xin."},{"n":69,"ch":"CHƯƠNG 7","q":"Mọi điều các ngươi muốn người ta làm cho mình, hãy làm cho họ. Chúa phán điều ấy là:","o":["Điều răn đầu tiên","Giao ước mới","Luật pháp và lời tiên tri","Mười điều răn"],"a":2,"r":"7:12"},{"n":70,"ch":"CHƯƠNG 7","q":"Chúa phán con đường dẫn đến sự hư mất thì:","o":["Dài, nhiều chông gai","Hẹp, ít người đi","Rộng, và nhiều người đi vào","Khó khăn, nhưng ai cũng đi"],"a":2,"r":"7:13"},{"n":71,"ch":"CHƯƠNG 7","q":"Các tiên tri giả đến với các ngươi, mặc lốt loài nào?","o":["Bồ câu","Chiên","Sư tử","Dê"],"a":1,"r":"7:15. Bề trong là muông sói hay cắn xé."},{"n":72,"ch":"CHƯƠNG 7","q":"Chúa phán không phải ai nói “Lạy Chúa, lạy Chúa” cũng vào nước thiên đàng, nhưng chỉ có người:","o":["Làm theo ý muốn Cha trên trời","Giữ ngày Sa-bát","Dâng nhiều của lễ","Giữ truyền thống của người xưa"],"a":0,"r":"7:21"},{"n":73,"ch":"CHƯƠNG 7","q":"Chúa so sánh người nghe lời Ngài mà không làm theo với người khôn dại xây nhà trên:","o":["Cát","Đồng bằng","Vầng đá","Bờ sông"],"a":0,"r":"7:26. Người khôn xây trên vầng đá."},{"n":74,"ch":"CHƯƠNG 7","q":"Vì sao dân chúng lấy làm lạ về cách Chúa Giê-xu dạy dỗ?","o":["Ngài dạy bằng dụ ngôn","Ngài dạy như có quyền, không như các thầy thông giáo","Ngài dạy trên núi","Ngài dạy trong đền thờ vào ngày lễ"],"a":1,"r":"7:28-29"},{"n":75,"ch":"CHƯƠNG 8","q":"Khi người phung xin được sạch, Chúa Giê-xu đã:","o":["Bảo đi tắm sông Giô-đanh","Chỉ phán từ xa","Đưa tay rờ người ấy và phán “Ta khứng, hãy sạch đi”","Bảo đi trình diện thầy tế lễ rồi mới chữa"],"a":2,"r":"8:2-3"},{"n":76,"ch":"CHƯƠNG 8","q":"Chúa Giê-xu nói về đức tin của quan đội trưởng:","o":["Ông chưa đủ đức tin","Đức tin ông còn nhỏ","Chưa thấy ai trong dân Y-sơ-ra-ên có đức tin lớn dường ấy","Ông là người ngoại nên không thể có đức tin"],"a":2,"r":"8:10"},{"n":77,"ch":"CHƯƠNG 8","q":"Quan đội trưởng thưa với Chúa điều gì?","o":["“Xin Chúa đặt tay trên nó”","“Xin Chúa chỉ phán một lời, thì đầy tớ tôi sẽ lành”","“Xin Chúa đến nhà tôi”","“Xin Chúa chữa nó khi tôi dâng của lễ”"],"a":1,"r":"8:8"},{"n":78,"ch":"CHƯƠNG 8","q":"Chúa chữa lành ai đang bị sốt trong nhà Phi-e-rơ?","o":["Mẹ vợ Phi-e-rơ","Con gái Phi-e-rơ","Vợ Phi-e-rơ","Con trai Phi-e-rơ"],"a":0,"r":"8:14-15"},{"n":79,"ch":"CHƯƠNG 8","q":"Ma-thi-ơ 8:17 trích lời tiên tri nào: “Chính Ngài đã gánh lấy tật nguyền chúng ta”?","o":["Ô-sê","Ê-sai","Giê-rê-mi","Đa-ni-ên"],"a":1,"r":"8:17"},{"n":80,"ch":"CHƯƠNG 8","q":"Chúa phán: “Con cáo có hang, chim trời có ổ; nhưng Con Người…”","o":["Không có chỗ gối đầu","Có ngai trên trời","Có nhà ở Ca-bê-na-um","Có cung điện ở Giê-ru-sa-lem"],"a":0,"r":"8:20"},{"n":81,"ch":"CHƯƠNG 8","q":"Khi bão tố nổi lên trên biển, Chúa Giê-xu đang làm gì?","o":["Chèo thuyền","Cầu nguyện trên núi","Ngủ","Câu cá"],"a":2,"r":"8:24"},{"n":82,"ch":"CHƯƠNG 8","q":"Ma-thi-ơ ghi có bao nhiêu người bị quỷ ám ở xứ Ga-đa-ra?","o":["Một","Hai","Ba","Bốn"],"a":1,"r":"8:28. Mác và Lu-ca chỉ ghi một người."},{"n":83,"ch":"CHƯƠNG 8","q":"Các quỷ xin Chúa cho chúng vào đâu?","o":["Bầy heo","Đàn chim","Bầy chiên","Biển Chết"],"a":0,"r":"8:31-32"},{"n":84,"ch":"CHƯƠNG 9","q":"Điều đầu tiên Chúa phán với người bại liệt được bạn bè khiêng đến là gì?","o":["“Hãy đứng dậy, vác giường mà đi”","“Đức tin con đã cứu con”","“Hỡi con, hãy vững lòng, tội lỗi con đã được tha”","“Hỡi con gái, hãy đứng dậy”"],"a":2,"r":"9:2"},{"n":85,"ch":"CHƯƠNG 9","q":"Khi thấy Ma-thi-ơ ngồi ở sở thu thuế, Chúa Giê-xu phán:","o":["“Hãy theo Ta”","“Hãy dâng của lễ cho Ta”","“Hãy bỏ nghề của ngươi đi”","“Hãy đến nhà Ta ăn tiệc”"],"a":0,"r":"9:9"},{"n":86,"ch":"CHƯƠNG 9","q":"Khi bị chê là ăn chung với người thu thuế và kẻ có tội, Chúa đáp:","o":["Ta đến để giữ ngày Sa-bát","Kẻ mạnh khỏe không cần thầy thuốc, nhưng kẻ có bệnh mới cần","Ta đến để phán xét người có tội","Ta đến để dạy các thầy thông giáo"],"a":1,"r":"9:12"},{"n":87,"ch":"CHƯƠNG 9","q":"Chúa trích lời tiên tri nào: “Ta muốn lòng thương xót, không muốn của tế lễ”?","o":["Ê-sai","Mi-chê","Ô-sê","Giô-ên"],"a":2,"r":"9:13. Câu này được nhắc lại ở 12:7."},{"n":88,"ch":"CHƯƠNG 9","q":"Khi môn đồ Giăng hỏi sao môn đồ Chúa không kiêng ăn, Chúa ví mình như:","o":["Chàng rể","Người chăn chiên","Người gieo giống","Người làm vườn"],"a":0,"r":"9:15"},{"n":89,"ch":"CHƯƠNG 9","q":"Chúa phán về con gái người cai nhà hội đã chết:","o":["“Con bé sẽ lành bệnh”","“Con bé không chết, nhưng ngủ”","“Con bé đã được tha tội”","“Con bé đã chết, hãy chôn đi”"],"a":1,"r":"9:24"},{"n":90,"ch":"CHƯƠNG 9","q":"Người đàn bà bị bệnh huyết mười hai năm tin rằng chỉ cần đụng đến:","o":["Tay Chúa","Chân Chúa","Trải áo Chúa","Đôi giày Chúa"],"a":2,"r":"9:20-22. Chúa phán: “Hỡi con gái, hãy yên lòng, đức tin con đã chữa lành con.”"},{"n":91,"ch":"CHƯƠNG 9","q":"Hai người mù theo Chúa kêu xin như thế nào?","o":["“Con vua Đa-vít ơi, xin thương xót chúng tôi!”","“Lạy Chúa, xin cho chúng tôi thấy”","“Thầy ơi, xin nhớ đến chúng tôi”","“Lạy Chúa, xin đừng bỏ chúng tôi!”"],"a":0,"r":"9:27"},{"n":92,"ch":"CHƯƠNG 9","q":"Khi thấy đoàn dân, Chúa Giê-xu động lòng thương vì họ cùng khổ và tản lạc như:","o":["Cá không có lưới","Chiên không có người chăn","Chim không có ổ","Đoàn dê không có đồng cỏ"],"a":1,"r":"9:36"},{"n":93,"ch":"CHƯƠNG 9","q":"Chúa phán: “Mùa gặt thì trúng, song thợ gặt thì ít.” Vậy các môn đồ hãy:","o":["Chờ đến mùa sau","Tự đi gặt ngay","Xin Chủ mùa gặt sai thợ đến gặt","Thuê thêm người làm"],"a":2,"r":"9:37-38"},{"n":94,"ch":"CHƯƠNG 10","q":"Trong danh sách mười hai sứ đồ, sứ đồ nào đứng đầu tiên?","o":["Anh-rê","Giăng","Si-môn gọi là Phi-e-rơ","Gia-cơ"],"a":2,"r":"10:2"},{"n":95,"ch":"CHƯƠNG 10","q":"Sứ đồ nào được ghi kèm là “người thu thuế” trong danh sách mười hai sứ đồ?","o":["Ma-thi-ơ","Phi-líp","Thô-ma","Si-môn người Ca-na-an"],"a":0,"r":"10:3"},{"n":96,"ch":"CHƯƠNG 10","q":"Khi sai mười hai sứ đồ, Chúa dặn trước hết hãy đi đến cùng:","o":["Người Sa-ma-ri","Chiên lạc của nhà Y-sơ-ra-ên","Dân ngoại","Người La-mã"],"a":1,"r":"10:5-6"},{"n":97,"ch":"CHƯƠNG 10","q":"Chúa dặn các sứ đồ: “Các ngươi đã nhận không thì…”","o":["Hãy xin báo đáp","Hãy cho không","Hãy thu tiền công","Hãy bán lại"],"a":1,"r":"10:8"},{"n":98,"ch":"CHƯƠNG 10","q":"Chúa sai các sứ đồ đi như chiên vào giữa muông sói, nên phải khôn khéo như rắn và:","o":["Nhanh nhẹn như nai","Mạnh mẽ như sư tử","Đơn sơ như bồ câu","Hiền lành như chiên"],"a":2,"r":"10:16"},{"n":99,"ch":"CHƯƠNG 10","q":"Chúa dạy đừng sợ kẻ giết thân thể mà không giết được linh hồn; hãy sợ:","o":["Đấng có thể hủy diệt cả linh hồn lẫn thân thể trong địa ngục","Các thầy tế lễ cả","Người La-mã","Các tiên tri giả"],"a":0,"r":"10:28"},{"n":100,"ch":"CHƯƠNG 10","q":"Chúa nói về chim sẻ: không một con nào rơi xuống đất mà:","o":["Cha các ngươi không biết","Không được ai ăn","Không có tiếng kêu","Được người ta nhặt về nuôi"],"a":0,"r":"10:29. Tóc trên đầu các ngươi cũng đã đếm hết."},{"n":101,"ch":"CHƯƠNG 10","q":"Chúa phán ai nhận Ngài trước mặt người ta thì:","o":["Sẽ không bị bắt bớ","Ngài cũng sẽ nhận người ấy trước mặt Cha trên trời","Sẽ được giàu có","Được cất khỏi sự bắt bớ"],"a":1,"r":"10:32"},{"n":102,"ch":"CHƯƠNG 10","q":"Chúa phán: “Ta không đến đem sự bình an trên đất, nhưng đem…”","o":["Nước","Lửa","Gươm giáo","Của cải"],"a":2,"r":"10:34"},{"n":103,"ch":"CHƯƠNG 10","q":"Chúa phán ai không vác thập tự giá mình mà theo Ngài thì:","o":["Không được ăn bánh","Không đáng làm môn đồ Ngài","Bị đuổi khỏi nhà hội","Bị ném ra ngoài đồng vắng"],"a":1,"r":"10:38"},{"n":104,"ch":"CHƯƠNG 10","q":"Ai cho một trong những kẻ nhỏ nầy uống chén nước lạnh nhân danh môn đồ thì:","o":["Chắc không mất phần thưởng","Được vào đền thờ","Được đền gấp trăm","Được ngồi bên hữu Chúa"],"a":0,"r":"10:42"},{"n":105,"ch":"CHƯƠNG 11","q":"Từ trong ngục, Giăng Báp-tít sai môn đồ hỏi Chúa Giê-xu điều gì?","o":["“Thầy sẽ cứu tôi ra khỏi ngục chăng?”","“Khi nào Thầy làm vua?”","“Thầy có phải là Đấng phải đến, hay chúng tôi phải đợi người khác?”","“Thầy sẽ xin lửa từ trời xuống chăng?”"],"a":2,"r":"11:3"},{"n":106,"ch":"CHƯƠNG 11","q":"Chúa trả lời môn đồ Giăng bằng cách nào?","o":["Phán thẳng “Ta là Đấng Christ”","Không trả lời","Kể những điều họ thấy và nghe: người mù thấy, kẻ què đi…","Bảo họ đến hỏi các thầy thông giáo"],"a":2,"r":"11:4-5"},{"n":107,"ch":"CHƯƠNG 11","q":"Chúa nói trong những người do đàn bà sinh ra, không ai lớn hơn:","o":["Đa-vít","Giăng Báp-tít","Môi-se","Ê-li"],"a":1,"r":"11:11"},{"n":108,"ch":"CHƯƠNG 11","q":"Chúa nói Giăng Báp-tít chính là ai, nếu họ chịu nhận?","o":["Ê-li, người phải đến","Ê-sai","Môi-se","Giô-suê"],"a":0,"r":"11:14"},{"n":109,"ch":"CHƯƠNG 11","q":"Cùng với Ca-bê-na-um, hai thành nào bị Chúa quở “Khốn cho ngươi”?","o":["Cô-ra-xin và Bết-sai-đa","Na-xa-rét và Bết-lê-hem","Ty-rơ và Si-đôn","Ca-na và Na-in"],"a":0,"r":"11:21-23"},{"n":110,"ch":"CHƯƠNG 11","q":"Chúa tạ ơn Cha vì đã giấu những điều ấy với bậc khôn ngoan thông sáng, mà tỏ ra cho:","o":["Các thầy tế lễ","Các thầy thông giáo","Những kẻ nhỏ mọn","Các nhà vua"],"a":2,"r":"11:25"},{"n":111,"ch":"CHƯƠNG 11","q":"“Hỡi những kẻ mệt mỏi và gánh nặng, hãy đến cùng Ta, Ta sẽ cho các ngươi…”","o":["Sự sống đời đời","Được yên nghỉ","Sự bình an","Sự giàu sang"],"a":1,"r":"11:28. “Sự bình an” là lời hứa ở Giăng 14:27."},{"n":112,"ch":"CHƯƠNG 11","q":"Chúa tự nhận mình có tấm lòng như thế nào?","o":["Nhu mì và khiêm nhường","Mạnh mẽ và quyền năng","Rộng rãi và hào phóng","Kiêu hãnh và cứng cỏi"],"a":0,"r":"11:29"},{"n":113,"ch":"CHƯƠNG 12","q":"Môn đồ bị người Pha-ri-si chê trách vì làm gì trong ngày Sa-bát?","o":["Câu cá","Bứt bông lúa mì để ăn","Hái trái nho","Nhóm lửa nướng bánh"],"a":1,"r":"12:1-2"},{"n":114,"ch":"CHƯƠNG 12","q":"Để bênh vực môn đồ, Chúa nhắc lại việc:","o":["Môi-se đánh nước ra từ vầng đá","Ê-li lên trời","Đa-vít ăn bánh trần thiết","Gia-cốp mơ thấy cái thang"],"a":2,"r":"12:3-4"},{"n":115,"ch":"CHƯƠNG 12","q":"Chúa phán Con Người là ai của ngày Sa-bát?","o":["Người giữ","Người chủ nhà","Chúa","Tôi tớ"],"a":2,"r":"12:8"},{"n":116,"ch":"CHƯƠNG 12","q":"Để bênh vực việc chữa lành ngày Sa-bát, Chúa nói ai cũng sẽ kéo lên nếu:","o":["Lừa bị lạc","Chiên rơi xuống hố","Bò đực bị mắc kẹt","Chim bồ câu bị mắc bẫy"],"a":1,"r":"12:11-12"},{"n":117,"ch":"CHƯƠNG 12","q":"Người Pha-ri-si nói Chúa đuổi quỷ nhờ ai?","o":["Bê-ên-xê-bun, chúa quỷ","Đa-vít","Sa-tan thật","Ba-anh"],"a":0,"r":"12:24"},{"n":118,"ch":"CHƯƠNG 12","q":"Chúa phán nước nào bị chia rẽ nghịch cùng nhau thì sẽ:","o":["Trở nên hoang vu","Được thịnh vượng","Được vững bền","Trở nên mạnh hơn"],"a":0,"r":"12:25"},{"n":119,"ch":"CHƯƠNG 12","q":"Chúa phán sự lộng ngôn nghịch cùng ai thì sẽ không được tha?","o":["Con Người","Cha","Đức Thánh Linh","Môi-se"],"a":2,"r":"12:31-32"},{"n":120,"ch":"CHƯƠNG 12","q":"Chúa phán mỗi lời vô ích người ta nói ra, đến ngày phán xét sẽ:","o":["Được tha","Phải khai trình","Bị quên đi","Được ban thưởng"],"a":1,"r":"12:36"},{"n":121,"ch":"CHƯƠNG 12","q":"Chúa Giê-xu phán dấu lạ của Giô-na: Giô-na ở trong bụng cá lớn bao lâu?","o":["Bốn mươi ngày","Ba ngày ba đêm","Bảy ngày bảy đêm","Hai ngày hai đêm"],"a":1,"r":"12:40"},{"n":122,"ch":"CHƯƠNG 12","q":"Người thành nào sẽ đứng dậy trong ngày phán xét vì họ đã ăn năn khi nghe Giô-na giảng?","o":["Ni-ni-ve","Ba-by-lôn","Sô-đôm","Giê-ri-cô"],"a":0,"r":"12:41"},{"n":123,"ch":"CHƯƠNG 12","q":"Nữ hoàng phương nam đã từ nơi xa đến nghe sự khôn ngoan của ai?","o":["Đa-vít","Môi-se","Sa-lô-môn","Giô-suê"],"a":2,"r":"12:42"},{"n":124,"ch":"CHƯƠNG 12","q":"Chúa phán ai là anh em, chị em, mẹ của Ngài?","o":["Ai giữ ngày Sa-bát","Ai theo Ngài đến cùng","Ai làm theo ý muốn của Cha Ngài ở trên trời","Ai ở trong nhà Ngài"],"a":2,"r":"12:50"},{"n":125,"ch":"CHƯƠNG 13","q":"Khi dạy bằng dụ ngôn, Chúa Giê-xu ngồi ở đâu còn đoàn dân đứng trên bờ?","o":["Trên núi","Trên thuyền","Trong nhà hội","Trên đồi"],"a":1,"r":"13:2"},{"n":126,"ch":"CHƯƠNG 13","q":"Trong dụ ngôn người gieo giống, hạt rơi ở ven đường thì:","o":["Chim đến ăn hết","Bị nắng cháy","Bị gai nghẹt","Bị nước cuốn trôi"],"a":0,"r":"13:4"},{"n":127,"ch":"CHƯƠNG 13","q":"Hạt rơi nơi đất đá sỏi thì:","o":["Bị chim ăn","Mọc lên liền nhưng bị nắng cháy vì không có rễ","Bị gai nghẹt","Bị cuốn trôi theo mưa"],"a":1,"r":"13:5-6"},{"n":128,"ch":"CHƯƠNG 13","q":"Hạt rơi vào bụi gai thì:","o":["Gai mọc lên làm nghẹt","Chim đến ăn","Khô héo vì không có rễ","Bị cào cào cắn phá"],"a":0,"r":"13:7"},{"n":129,"ch":"CHƯƠNG 13","q":"Hạt rơi vào đất tốt thì sinh ra bao nhiêu?","o":["Gấp mười, gấp hai chục","Gấp đôi","Một trăm, sáu chục hoặc ba chục","Gấp mười hai, gấp bảy, gấp ba"],"a":2,"r":"13:8"},{"n":130,"ch":"CHƯƠNG 13","q":"Chúa nói các môn đồ được ban cho biết điều gì?","o":["Tên các thiên sứ","Ngày giờ Chúa trở lại","Những điều mầu nhiệm của nước thiên đàng","Số ngày tận thế"],"a":2,"r":"13:11"},{"n":131,"ch":"CHƯƠNG 13","q":"Trong dụ ngôn cỏ lùng, ai đã gieo cỏ lùng vào ruộng?","o":["Chủ ruộng","Kẻ thù, lúc người ta ngủ","Người làm công lười biếng","Tôi tớ của chủ"],"a":1,"r":"13:25"},{"n":132,"ch":"CHƯƠNG 13","q":"Dụ ngôn nào ví nước thiên đàng như hạt giống nhỏ nhất, lớn lên thành cây cho chim đến làm ổ?","o":["Hạt cải","Cỏ lùng","Men","Ngọc quý"],"a":0,"r":"13:31-32"},{"n":133,"ch":"CHƯƠNG 13","q":"Trong dụ ngôn men, người đàn bà lấy men trộn vào bao nhiêu bột?","o":["Mười đấu","Năm đấu","Ba đấu","Bảy đấu"],"a":2,"r":"13:33"},{"n":134,"ch":"CHƯƠNG 13","q":"Trong dụ ngôn kho báu, người tìm thấy kho báu chôn trong ruộng đã làm gì?","o":["Bán hết gia tài để mua ruộng ấy","Giấu kín và bỏ đi","Báo cho chủ ruộng","Đào lên rồi chia cho người nghèo"],"a":0,"r":"13:44"},{"n":135,"ch":"CHƯƠNG 13","q":"Nước thiên đàng giống như người lái buôn tìm:","o":["Hạt giống quý","Ngọc châu tốt","Vàng ròng","Nước hoa quý"],"a":1,"r":"13:45-46"},{"n":136,"ch":"CHƯƠNG 13","q":"Trong dụ ngôn tay lưới, người ta làm gì với cá tốt và cá xấu?","o":["Bán tất cả","Gom cá tốt vào giỏ, quăng cá xấu đi","Giữ lại tất cả","Chia đều cho người nghèo"],"a":1,"r":"13:47-48"},{"n":137,"ch":"CHƯƠNG 13","q":"Chúa phán: “Một tiên tri chẳng bị khinh dể trừ ra ở…”","o":["Tại quê hương và trong nhà mình","Tại Giê-ru-sa-lem","Tại nhà hội","Tại Ca-bê-na-um"],"a":0,"r":"13:57"},{"n":138,"ch":"CHƯƠNG 13","q":"Dân Na-xa-rét gọi Chúa là con của một người làm nghề gì?","o":["Chài lưới","Thu thuế","Thợ mộc","Dệt vải"],"a":2,"r":"13:55"},{"n":139,"ch":"CHƯƠNG 13","q":"Vì sao Chúa không làm nhiều phép lạ tại Na-xa-rét?","o":["Vì họ vô tín","Vì Ngài mệt mỏi","Vì chưa đến giờ","Vì dân sự chống đối"],"a":0,"r":"13:58"},{"n":140,"ch":"CHƯƠNG 14","q":"Nghe tiếng Chúa Giê-xu, Hê-rốt nghĩ Ngài là ai?","o":["Ê-li trở lại","Giăng Báp-tít sống lại","Môi-se","Đa-vít sống lại"],"a":1,"r":"14:1-2"},{"n":141,"ch":"CHƯƠNG 14","q":"Giăng Báp-tít bị Hê-rốt bỏ tù vì đã quở trách việc gì?","o":["Hê-rốt không giữ ngày Sa-bát","Hê-rốt thờ thần giả","Hê-rốt lấy Hê-rô-đia, vợ của anh mình","Hê-rốt không dâng của lễ"],"a":2,"r":"14:3-4"},{"n":142,"ch":"CHƯƠNG 14","q":"Con gái Hê-rô-đia xin điều gì sau khi nhảy múa?","o":["Đầu Giăng Báp-tít để trên mâm","Một nửa nước","Chiếc nhẫn của vua","Cai trị một thành"],"a":0,"r":"14:8"},{"n":143,"ch":"CHƯƠNG 14","q":"Chúa nuôi năm ngàn đàn ông bằng:","o":["Hai cái bánh và năm con cá","Năm cái bánh và hai con cá","Bảy cái bánh và vài con cá nhỏ","Ba cái bánh và bảy con cá"],"a":1,"r":"14:17. Bánh vụn thừa đầy mười hai giỏ (14:20)."},{"n":144,"ch":"CHƯƠNG 14","q":"Chúa đi trên mặt biển vào lúc nào?","o":["Canh nhất","Giữa trưa","Canh tư đêm","Canh hai"],"a":2,"r":"14:25"},{"n":145,"ch":"CHƯƠNG 14","q":"Thấy Chúa đi trên mặt biển, các môn đồ tưởng là:","o":["Giăng Báp-tít","Thiên sứ","Một con ma","Một nhà tiên tri"],"a":2,"r":"14:26"},{"n":146,"ch":"CHƯƠNG 14","q":"Ai xin Chúa cho mình đi trên nước đến cùng Ngài?","o":["Anh-rê","Phi-e-rơ","Giăng","Gia-cơ"],"a":1,"r":"14:28-29. Chỉ có Ma-thi-ơ ghi chi tiết nầy."},{"n":147,"ch":"CHƯƠNG 14","q":"Phi-e-rơ bắt đầu chìm vì sao?","o":["Thấy gió thì sợ","Mệt mỏi","Chiếc thuyền cách quá xa","Sóng nhấn chìm thuyền"],"a":0,"r":"14:30"},{"n":148,"ch":"CHƯƠNG 14","q":"Đến Ghê-nê-xa-rết, người bệnh xin được chạm đến điều gì?","o":["Tay Chúa","Bóng Chúa","Trải áo Chúa","Dây lưng Chúa"],"a":2,"r":"14:36"},{"n":149,"ch":"CHƯƠNG 15","q":"Chúa quở người Pha-ri-si vì lệ truyền khẩu mà họ bỏ điều răn nào?","o":["Hãy hiếu kính cha mẹ","Hãy nhớ ngày Sa-bát","Chớ giết người","Chớ trộm cắp"],"a":0,"r":"15:3-4"},{"n":150,"ch":"CHƯƠNG 15","q":"Chúa trích lời tiên tri nào: “Dân nầy lấy môi miệng tôn Ta, lòng chúng nó cách xa Ta”?","o":["Ô-sê","Ê-sai","Giê-rê-mi","Mi-chê"],"a":1,"r":"15:7-8"},{"n":151,"ch":"CHƯƠNG 15","q":"Chúa phán điều làm dơ dáy con người là:","o":["Điều từ miệng ra","Điều vào miệng","Bàn tay chưa rửa","Việc ăn thịt heo"],"a":0,"r":"15:11"},{"n":152,"ch":"CHƯƠNG 15","q":"Chúa gọi những người Pha-ri-si là:","o":["Cây vả khô","Kẻ mù dắt người mù","Người chăn chiên dở","Chủ vườn nho dở"],"a":1,"r":"15:14"},{"n":153,"ch":"CHƯƠNG 15","q":"Người đàn bà đến xin Chúa chữa con gái bị quỷ ám ở miền Ty-rơ và Si-đôn thuộc dân nào?","o":["Sa-ma-ri","Hy Lạp","Ca-na-an","Phi-li-tin"],"a":2,"r":"15:21-22"},{"n":154,"ch":"CHƯƠNG 15","q":"Người đàn bà đáp rằng chó con cũng ăn:","o":["Thịt từ bàn tiệc","Bánh của con cái","Bánh vụn từ bàn chủ rớt xuống","Cá từ biển"],"a":2,"r":"15:27"},{"n":155,"ch":"CHƯƠNG 15","q":"Chúa Giê-xu khen người đàn bà ấy:","o":["Ngươi là người công chính","Hỡi đàn bà, đức tin ngươi lớn thay","Ngươi biết rõ luật pháp","Hỡi con, tội ngươi đã được tha"],"a":1,"r":"15:28"},{"n":156,"ch":"CHƯƠNG 15","q":"Khi nuôi bốn ngàn người, Chúa nói dân đã ở với Ngài bao lâu?","o":["Ba ngày","Một ngày","Bảy ngày","Hai ngày"],"a":0,"r":"15:32"},{"n":157,"ch":"CHƯƠNG 15","q":"Trong Ma-thi-ơ 15, bánh vụn thừa khi Chúa nuôi bốn ngàn người được bao nhiêu giỏ?","o":["Bảy giỏ","Ba giỏ","Mười hai giỏ","Năm giỏ"],"a":0,"r":"15:37. Mười hai giỏ là lần nuôi năm ngàn người."},{"n":158,"ch":"CHƯƠNG 15","q":"Sau khi nuôi bốn ngàn người, Chúa xuống thuyền đến xứ nào?","o":["Giê-ri-cô","Ma-ga-đan","Ca-bê-na-um","Bết-sai-đa"],"a":1,"r":"15:39"},{"n":159,"ch":"CHƯƠNG 16","q":"Chúa hỏi môn đồ “Người ta nói Con Người là ai?” tại vùng nào?","o":["Ca-na","Giê-ri-cô","Sê-sa-rê Phi-líp","Bê-tha-ni"],"a":2,"r":"16:13"},{"n":160,"ch":"CHƯƠNG 16","q":"“Men” của người Pha-ri-si và Sa-đu-sê mà Chúa cảnh báo là gì?","o":["Bánh của họ","Của lễ của họ","Giáo lý của họ","Quần áo của họ"],"a":2,"r":"16:6, 12"},{"n":161,"ch":"CHƯƠNG 16","q":"Theo 16:14, người ta nói Chúa Giê-xu là ai?","o":["Giăng Báp-tít, Ê-li, Giê-rê-mi hay một đấng tiên tri","Môi-se, Đa-vít hay Sa-lô-môn","Áp-ra-ham, Ê-sai hay Đa-ni-ên","Ê-sai, Ê-xê-chi-ên hay Đa-ni-ên"],"a":0,"r":"16:14"},{"n":162,"ch":"CHƯƠNG 16","q":"Chúa gọi Phi-e-rơ là Si-môn con của ai?","o":["Xê-bê-đê","Giô-na","A-phê","Xa-cha-ri"],"a":1,"r":"16:17"},{"n":163,"ch":"CHƯƠNG 16","q":"Trong lời Chúa phán với Phi-e-rơ về Hội thánh, điều gì chẳng thắng được Hội thánh?","o":["Các cửa đền thờ","Các cửa thành Giê-ru-sa-lem","Các cửa âm phủ","Các cửa thành Rô-ma"],"a":2,"r":"16:18"},{"n":164,"ch":"CHƯƠNG 16","q":"Chúa phán sẽ trao cho Phi-e-rơ điều gì?","o":["Chiếc ngai của Đa-vít","Chìa khóa của nước thiên đàng","Đền thờ mới","Cây gậy của Môi-se"],"a":1,"r":"16:19"},{"n":165,"ch":"CHƯƠNG 16","q":"Từ đó Chúa bắt đầu tỏ cho môn đồ biết Ngài phải làm gì?","o":["Đến Giê-ru-sa-lem, chịu khổ, bị giết và ngày thứ ba sống lại","Trở về Na-xa-rét","Lên ngôi vua","Giảng cho dân ngoại"],"a":0,"r":"16:21"},{"n":166,"ch":"CHƯƠNG 16","q":"Chúa phán nếu người được cả thế gian mà mất linh hồn thì:","o":["Ích gì cho người ấy","Được đền bù","Được tha tội","Không hề hấn gì"],"a":0,"r":"16:26"},{"n":167,"ch":"CHƯƠNG 17","q":"Biến hình xảy ra sau lời Chúa hứa bao lâu?","o":["Bảy ngày","Sáu ngày","Ba ngày","Chín ngày"],"a":1,"r":"17:1. Chúa dẫn Phi-e-rơ, Gia-cơ và Giăng lên núi cao."},{"n":168,"ch":"CHƯƠNG 17","q":"Khi biến hình, mặt Chúa Giê-xu sáng như gì?","o":["Ngôi sao","Mặt trăng","Mặt trời","Ngọn lửa"],"a":2,"r":"17:2. Áo Ngài trắng như ánh sáng."},{"n":169,"ch":"CHƯƠNG 17","q":"Hai nhân vật Cựu Ước hiện ra nói chuyện với Chúa khi biến hình là ai?","o":["Ê-li và Ê-li-sê","Môi-se và Ê-li","Áp-ra-ham và Môi-se","Ê-sai và Ê-li"],"a":1,"r":"17:3"},{"n":170,"ch":"CHƯƠNG 17","q":"Phi-e-rơ đề nghị làm gì khi thấy Chúa biến hình?","o":["Dựng ba cái lều","Xây một bàn thờ","Dựng một đền thờ","Hiến của lễ thiêu"],"a":0,"r":"17:4"},{"n":171,"ch":"CHƯƠNG 17","q":"Tiếng từ đám mây sáng phán các môn đồ hãy làm gì?","o":["Quỳ xuống thờ lạy","Giữ im lặng","Nghe lời Con yêu dấu ấy","Rời khỏi núi ngay"],"a":2,"r":"17:5"},{"n":172,"ch":"CHƯƠNG 17","q":"Chúa phán nếu có đức tin nhỏ bằng gì thì có thể dời núi?","o":["Hạt cải","Hạt lúa mì","Hạt nho","Hạt mè"],"a":0,"r":"17:20"},{"n":173,"ch":"CHƯƠNG 17","q":"Chúa bảo Phi-e-rơ đóng thuế đền thờ bằng cách nào?","o":["Bán áo ngoài","Câu cá, lấy đồng bạc trong miệng con cá đầu tiên","Vay của bạn","Bán chiếc thuyền"],"a":1,"r":"17:27"},{"n":174,"ch":"CHƯƠNG 18","q":"Khi môn đồ hỏi ai lớn hơn hết trong nước thiên đàng, Chúa đặt ai ở giữa họ?","o":["Một người thu thuế","Một thầy tế lễ","Một đứa trẻ nhỏ","Một người nghèo"],"a":2,"r":"18:1-2"},{"n":175,"ch":"CHƯƠNG 18","q":"Chúa nói ai làm cho một trong những kẻ nhỏ nầy vấp ngã thì tốt hơn là buộc vào cổ mình:","o":["Cái cối xay rồi quăng xuống biển","Cái neo","Cục đá","Sợi xích sắt"],"a":0,"r":"18:6"},{"n":176,"ch":"CHƯƠNG 18","q":"Thiên sứ của những trẻ nhỏ luôn thấy mặt ai trên trời?","o":["Vua Đa-vít","Cha Ta","Thầy tế lễ thượng phẩm","Môi-se"],"a":1,"r":"18:10"},{"n":177,"ch":"CHƯƠNG 18","q":"Người có một trăm con chiên, một con bị lạc, sẽ bỏ lại bao nhiêu con để đi tìm?","o":["Năm mươi con","Chín mươi con","Chín mươi chín con","Không bỏ con nào"],"a":2,"r":"18:12"},{"n":178,"ch":"CHƯƠNG 18","q":"Khi anh em phạm tội với mình, bước đầu tiên Chúa dạy là:","o":["Báo ngay với Hội thánh","Kể cho mọi người biết","Đi trách người ấy riêng một mình","Cầu nguyện cho người ấy"],"a":2,"r":"18:15"},{"n":179,"ch":"CHƯƠNG 18","q":"Nếu người ấy không nghe, bước kế tiếp là:","o":["Đuổi người ấy ra","Đem theo một hai người nữa để làm chứng","Cầu nguyện một mình","Kiện người ấy ra trước quan án"],"a":1,"r":"18:16"},{"n":180,"ch":"CHƯƠNG 18","q":"Chúa hứa: “Ở đâu có hai ba người nhân danh Ta nhóm lại…”","o":["Ta ở giữa họ","Ta sẽ chữa lành","Ta sẽ ban bình an","Ta sẽ hiện ra"],"a":0,"r":"18:20"},{"n":181,"ch":"CHƯƠNG 18","q":"Trong dụ ngôn đầy tớ không thương xót, người đầy tớ được tha nợ lớn đã đối xử với bạn đồng liêu nợ mình ra sao?","o":["Bóp cổ và bỏ tù cho đến khi trả hết","Tha nợ cho bạn","Cho bạn thêm thời hạn","Tha nợ và mời ăn tiệc"],"a":0,"r":"18:28-30"},{"n":182,"ch":"CHƯƠNG 18","q":"Chúa kết luận: Cha trên trời cũng sẽ đãi các ngươi như vậy nếu mỗi người không:","o":["Giữ ngày Sa-bát","Hết lòng tha tội cho anh em mình","Dâng một phần mười","Dâng của lễ"],"a":1,"r":"18:35"},{"n":183,"ch":"CHƯƠNG 19","q":"Người Pha-ri-si đến hỏi để thử Chúa về vấn đề nào?","o":["Việc đóng thuế cho Sê-sa","Việc kiêng ăn","Việc bỏ vợ","Việc thờ lạy"],"a":2,"r":"19:3"},{"n":184,"ch":"CHƯƠNG 19","q":"Chúa Giê-xu phán điều Đức Chúa Trời đã phối hiệp thì:","o":["Loài người không được phân rẽ","Môi-se sẽ quyết định","Có thể bỏ nếu có lý do","Sẽ phải cho giấy ly dị"],"a":0,"r":"19:6"},{"n":185,"ch":"CHƯƠNG 19","q":"Ai ngăn cản người ta đem trẻ nhỏ đến cùng Chúa?","o":["Người Pha-ri-si","Các môn đồ","Các thầy thông giáo","Quân La-mã"],"a":1,"r":"19:13"},{"n":186,"ch":"CHƯƠNG 19","q":"Chúa bảo người trai trẻ giàu có muốn được trọn vẹn thì phải làm gì?","o":["Dâng một phần mười","Giữ ngày Sa-bát trọn năm","Bán hết tài sản, cho kẻ nghèo, rồi theo Ngài","Cầu nguyện ba lần mỗi ngày"],"a":2,"r":"19:21"},{"n":187,"ch":"CHƯƠNG 19","q":"Nghe lời Chúa, người trai trẻ giàu có đã phản ứng thế nào?","o":["Hỏi thêm vài điều","Buồn rầu bỏ đi vì có nhiều của cải","Bán hết của cải","Vui mừng theo Chúa ngay"],"a":1,"r":"19:22"},{"n":188,"ch":"CHƯƠNG 19","q":"Chúa phán: “Điều đó loài người không thể làm được, nhưng…”","o":["Đức Chúa Trời làm mọi việc đều được","Đức tin làm mọi việc đều được","Sự khôn ngoan làm mọi việc đều được","Con người làm mọi việc được"],"a":0,"r":"19:26"},{"n":189,"ch":"CHƯƠNG 19","q":"Chúa hứa các môn đồ sẽ ngồi trên bao nhiêu ngai để xét xử các chi phái Y-sơ-ra-ên?","o":["Ba ngai","Bảy ngai","Mười hai ngai","Mười ngai"],"a":2,"r":"19:28"},{"n":190,"ch":"CHƯƠNG 19","q":"Chúa phán nhiều kẻ rất trước sẽ ra sao?","o":["Nên rất sau","Vào nước thiên đàng trước","Được thưởng gấp trăm","Được cất lên trời"],"a":0,"r":"19:30"},{"n":191,"ch":"CHƯƠNG 20","q":"Trong dụ ngôn thợ làm vườn nho, chủ vườn thỏa thuận trả công mỗi ngày bao nhiêu?","o":["Một ta-lâng","Một đơ-ni-ê","Mười đơ-ni-ê","Một mi-na"],"a":1,"r":"20:2"},{"n":192,"ch":"CHƯƠNG 20","q":"Chủ vườn nho trả công bắt đầu từ ai?","o":["Người làm giỏi nhất","Những người đến làm đầu tiên","Những người đến làm sau rốt","Những người lớn tuổi nhất"],"a":2,"r":"20:8"},{"n":193,"ch":"CHƯƠNG 20","q":"Chúa kết luận dụ ngôn thợ làm vườn nho bằng câu nào?","o":["Hãy làm việc khi còn ban ngày","Ai có sẽ được thêm","Kẻ rốt sẽ nên đầu, kẻ đầu sẽ nên rốt","Người khiêm nhường sẽ được tôn lên"],"a":2,"r":"20:16"},{"n":194,"ch":"CHƯƠNG 20","q":"Chúa báo trước Ngài sẽ bị nộp cho dân ngoại để:","o":["Nhạo báng, đánh đòn và đóng đinh trên thập tự giá","Bị lưu đày","Bị ném đá","Bị trục xuất khỏi Giê-ru-sa-lem"],"a":0,"r":"20:19"},{"n":195,"ch":"CHƯƠNG 20","q":"Chúa hỏi hai môn đồ có uống được ___ mà Ngài sắp uống không?","o":["Nước","Chén","Bánh","Bình"],"a":1,"r":"20:22"},{"n":196,"ch":"CHƯƠNG 20","q":"Chúa phán ai muốn làm lớn trong các ngươi thì:","o":["Hãy làm đầy tớ cho mọi người","Hãy làm vua","Hãy làm thầy tế lễ","Hãy làm kẻ giàu"],"a":0,"r":"20:26-27"},{"n":197,"ch":"CHƯƠNG 20","q":"Con Người đến không phải để được hầu việc, nhưng để hầu việc, và:","o":["Lập nước ở thế gian","Phó sự sống mình làm giá chuộc nhiều người","Sửa lại luật pháp","Chinh phục thế gian"],"a":1,"r":"20:28"},{"n":198,"ch":"CHƯƠNG 20","q":"Hai người mù ngồi bên đường ở thành nào kêu xin Chúa thương xót?","o":["Ca-na","Bê-tha-ni","Giê-ri-cô","Giê-ru-sa-lem"],"a":2,"r":"20:29-30"},{"n":199,"ch":"CHƯƠNG 20","q":"Khi hai người mù xin được sáng mắt, Chúa Giê-xu đã:","o":["Phán một lời từ xa","Bảo đi rửa ở ao","Động lòng thương và rờ mắt họ","Quở bóng tối"],"a":2,"r":"20:34"},{"n":200,"ch":"CHƯƠNG 21","q":"Khi gần đến Giê-ru-sa-lem, Chúa sai hai môn đồ vào làng nào?","o":["Bê-tha-ni","Bết-pha-giê, gần núi Ô-li-ve","Giê-ri-cô","Ca-bê-na-um"],"a":1,"r":"21:1"},{"n":201,"ch":"CHƯƠNG 21","q":"Chúa sai môn đồ đi dắt về:","o":["Một lừa cái và một lừa con","Một lừa đực già","Một con ngựa","Hai con lừa đực"],"a":0,"r":"21:2-7. Chỉ riêng Ma-thi-ơ nhắc cả lừa cái lẫn lừa con."},{"n":202,"ch":"CHƯƠNG 21","q":"Dân chúng trải gì trên đường khi Chúa vào thành, và reo lên điều gì?","o":["Áo ngoài và nhánh cây; “Hô-sa-na Con vua Đa-vít”","Thảm đỏ; “Vạn tuế vua Sê-sa”","Lá chà là; “Hãy thờ lạy Chúa”","Khăn trắng và hoa; “Vạn tuế vua Do Thái”"],"a":0,"r":"21:8-9"},{"n":203,"ch":"CHƯƠNG 21","q":"Khi cả thành bối rối hỏi “Đây là ai?”, dân chúng đáp Ngài là:","o":["Vua dân Giu-đa","Đấng tiên tri Giê-xu, người Na-xa-rét, xứ Ga-li-lê","Con Đức Chúa Trời","Ê-li trở lại"],"a":1,"r":"21:10-11"},{"n":204,"ch":"CHƯƠNG 21","q":"Chúa phán họ đã biến nhà cầu nguyện của Ngài thành:","o":["Chợ trời","Nhà hội","Hang trộm cướp","Nhà buôn bán"],"a":2,"r":"21:13"},{"n":205,"ch":"CHƯƠNG 21","q":"Chúa trích Thi-thiên: “Chúa đã đặt sự khen ngợi nơi miệng…”","o":["Các tiên tri","Trẻ con và đứa bú","Các thầy tế lễ","Các vua"],"a":1,"r":"21:16"},{"n":206,"ch":"CHƯƠNG 21","q":"Điều gì xảy ra với cây vả khi Chúa rủa nó?","o":["Khô héo ngay","Chết sau ba ngày","Đổ xuống","Mọc thêm lá xanh"],"a":0,"r":"21:19"},{"n":207,"ch":"CHƯƠNG 21","q":"Khi các thầy tế lễ cả hỏi Chúa làm các việc ấy bởi quyền nào, Chúa hỏi lại về điều gì?","o":["Luật pháp Môi-se","Đền thờ do ai xây","Phép báp-tem của Giăng từ đâu đến","Việc Chúa chữa lành ngày Sa-bát"],"a":2,"r":"21:25"},{"n":208,"ch":"CHƯƠNG 21","q":"Trong dụ ngôn hai con trai, người nào làm theo ý cha?","o":["Cả hai người","Người nói “xin vâng” mà không đi","Người nói “không muốn” nhưng sau ăn năn mà đi","Người con út, vì được cha thương hơn"],"a":2,"r":"21:28-31"},{"n":209,"ch":"CHƯƠNG 21","q":"Chúa nói những ai vào nước Đức Chúa Trời trước các thầy tế lễ cả và trưởng lão?","o":["Người ngoại bang","Người thu thuế và gái điếm","Người Sa-ma-ri","Các thầy thông giáo"],"a":1,"r":"21:31"},{"n":210,"ch":"CHƯƠNG 21","q":"Trong dụ ngôn vườn nho, những kẻ làm vườn độc ác đã giết ai?","o":["Con trai của chủ vườn","Người quản gia","Người làm công cuối cùng","Các đầy tớ được sai đến trước"],"a":0,"r":"21:37-39"},{"n":211,"ch":"CHƯƠNG 21","q":"Hòn đá thợ xây loại ra đã trở nên gì?","o":["Hòn đá góc nhà","Hòn đá thờ phượng","Hòn đá lót đường","Hòn đá nền móng của thành"],"a":0,"r":"21:42"},{"n":212,"ch":"CHƯƠNG 22","q":"Trong dụ ngôn tiệc cưới, vua làm tiệc cho ai?","o":["Sinh nhật mình","Con trai mình cưới vợ","Ngày lễ Vượt-qua","Lễ mừng vua lên ngôi"],"a":1,"r":"22:2"},{"n":213,"ch":"CHƯƠNG 22","q":"Người khách không mặc áo cưới bị đối xử thế nào?","o":["Được cho mượn áo","Bị phạt tiền","Bị trói tay chân, quăng ra chỗ tối ngoài","Bị đuổi khỏi thành"],"a":2,"r":"22:13"},{"n":214,"ch":"CHƯƠNG 22","q":"Chúa phán: “Nhiều người được gọi, nhưng…”","o":["Ít người ăn năn","Ít người nghe","Ít người được chọn","Ít người đến dự tiệc"],"a":2,"r":"22:14"},{"n":215,"ch":"CHƯƠNG 22","q":"Người Pha-ri-si cùng với nhóm nào đến hỏi Chúa về việc đóng thuế cho Sê-sa?","o":["Người Sa-đu-sê","Những người thuộc phe Hê-rốt","Những thầy thông giáo","Người Sa-ma-ri"],"a":1,"r":"22:15-16"},{"n":216,"ch":"CHƯƠNG 22","q":"Chúa bảo họ phải làm gì với đồng bạc có hình và chữ của Sê-sa?","o":["Trả cho Sê-sa vật của Sê-sa, trả cho Đức Chúa Trời vật của Đức Chúa Trời","Vứt bỏ","Đem dâng đền thờ","Đốt đi"],"a":0,"r":"22:21"},{"n":217,"ch":"CHƯƠNG 22","q":"Nhóm nào không tin có sự sống lại?","o":["Người Sa-đu-sê","Các thầy thông giáo","Người Pha-ri-si","Người La-mã"],"a":0,"r":"22:23"},{"n":218,"ch":"CHƯƠNG 22","q":"Người Sa-đu-sê hỏi về một người đàn bà lần lượt làm vợ bao nhiêu anh em?","o":["Mười hai","Bảy","Ba","Năm"],"a":1,"r":"22:25-26"},{"n":219,"ch":"CHƯƠNG 22","q":"Chúa phán khi sống lại, người ta không cưới gả, nhưng như:","o":["Những kẻ đã chết","Con trẻ","Các thiên sứ trên trời","Những tiên tri"],"a":2,"r":"22:30"},{"n":220,"ch":"CHƯƠNG 22","q":"Chúa phán Đức Chúa Trời không phải là Đức Chúa Trời của kẻ chết, nhưng của:","o":["Dân Y-sơ-ra-ên","Các tổ phụ","Kẻ sống","Các thiên sứ"],"a":2,"r":"22:32"},{"n":221,"ch":"CHƯƠNG 22","q":"Điều răn thứ nhì, giống như điều răn thứ nhất, là gì?","o":["Hãy yêu người lân cận như mình","Hãy giữ ngày Sa-bát","Hãy hiếu kính cha mẹ","Hãy dâng một phần mười"],"a":0,"r":"22:39"},{"n":222,"ch":"CHƯƠNG 22","q":"Khi Chúa hỏi Đấng Christ là con ai, người Pha-ri-si đáp:","o":["Con của Giu-đa","Con của Đa-vít","Con của Áp-ra-ham","Con của Môi-se"],"a":1,"r":"22:42"},{"n":223,"ch":"CHƯƠNG 23","q":"Về các thầy thông giáo và Pha-ri-si, Chúa dạy dân chúng:","o":["Làm theo lời họ nói nhưng đừng làm theo việc họ làm","Làm theo mọi điều họ làm","Tránh xa họ hoàn toàn","Đuổi họ ra khỏi nhà hội"],"a":0,"r":"23:3"},{"n":224,"ch":"CHƯƠNG 23","q":"Họ mở rộng ___ và nới dài ___ để cho người ta thấy.","o":["Khăn, giày","Hộp kinh, tua áo","Áo choàng, dây lưng","Cửa, hiên"],"a":1,"r":"23:5"},{"n":225,"ch":"CHƯƠNG 23","q":"Chúa dạy trong cộng đồng môn đồ chỉ có một Thầy, còn các ngươi đều là:","o":["Con cái","Tôi tớ","Anh em","Chủ"],"a":2,"r":"23:8"},{"n":226,"ch":"CHƯƠNG 23","q":"Chúa phán ai lớn hơn hết trong các ngươi thì phải:","o":["Làm thầy tế lễ","Làm trưởng lão","Làm đầy tớ các ngươi","Làm kẻ ngồi đầu bàn"],"a":2,"r":"23:11"},{"n":227,"ch":"CHƯƠNG 23","q":"Họ đi khắp biển và đất để làm một người giáo dân, rồi làm cho người ấy:","o":["Trở nên người công chính","Trở nên con của địa ngục gấp hai mình","Trở nên thầy thông giáo","Trở nên người thờ phượng thật"],"a":1,"r":"23:15"},{"n":228,"ch":"CHƯƠNG 23","q":"Chúa gọi các thầy thông giáo và Pha-ri-si là:","o":["Những người dẫn đường mù","Những người chăn chiên dở","Những cây vả khô","Những tên trộm"],"a":0,"r":"23:16"},{"n":229,"ch":"CHƯƠNG 23","q":"Họ dâng một phần mười bạc hà, hồi hương, kim hồi mà bỏ những điều trọng hơn nào?","o":["Công bình, thương xót và trung tín","Ngày Sa-bát","Của lễ thiêu","Của lễ chuộc tội"],"a":0,"r":"23:23"},{"n":230,"ch":"CHƯƠNG 23","q":"Chúa phán họ lọc muỗi mà:","o":["Nuốt ruồi","Nuốt lạc đà","Nuốt kiến","Nuốt chiên"],"a":1,"r":"23:24"},{"n":231,"ch":"CHƯƠNG 23","q":"Chúa nhắc huyết của người công chính từ ai đến huyết Xa-cha-ri bị đổ ra?","o":["Ê-nóc","Nô-ê","A-bên","Áp-ra-ham"],"a":2,"r":"23:35"},{"n":232,"ch":"CHƯƠNG 23","q":"Chúa than thở muốn nhóm họp con cái Giê-ru-sa-lem như:","o":["Gà mái ấp con dưới cánh","Chim đại bàng che chở con","Người chăn gom chiên","Chim sẻ che con dưới cánh"],"a":0,"r":"23:37"},{"n":233,"ch":"CHƯƠNG 24","q":"Khi môn đồ chỉ cho Chúa xem các công trình đền thờ, Chúa phán:","o":["Đền thờ sẽ được xây lại lớn hơn","Đền thờ sẽ được dời đi","Không còn một hòn đá nào chồng trên hòn khác mà không bị đổ","Đền thờ sẽ đứng vững"],"a":2,"r":"24:1-2"},{"n":234,"ch":"CHƯƠNG 24","q":"Chúa giảng về các dấu hiệu ngày tận thế khi ngồi ở đâu?","o":["Bên bờ biển Ga-li-lê","Núi Ô-li-ve","Núi Hẹt-môn","Núi Si-nai"],"a":1,"r":"24:3"},{"n":235,"ch":"CHƯƠNG 24","q":"Chúa phán ai bền chí cho đến cuối cùng thì:","o":["Sẽ được giàu có","Sẽ không bị bắt bớ","Sẽ được cứu","Sẽ làm vua"],"a":2,"r":"24:13"},{"n":236,"ch":"CHƯƠNG 24","q":"Trước khi sự cuối cùng đến, tin lành về nước thiên đàng sẽ:","o":["Bị cấm hoàn toàn","Được giảng khắp thế gian để làm chứng cho muôn dân","Chỉ được giảng tại Giê-ru-sa-lem","Bị quên lãng"],"a":1,"r":"24:14"},{"n":237,"ch":"CHƯƠNG 24","q":"“Sự gớm ghiếc làm cho hoang vu” được Chúa nhắc là lời của tiên tri nào?","o":["Đa-ni-ên","Ê-sai","Ê-xê-chi-ên","Giô-ên"],"a":0,"r":"24:15"},{"n":238,"ch":"CHƯƠNG 24","q":"Con Người đến như:","o":["Cơn gió mạnh","Chớp nhoáng từ phương đông đến phương tây","Tiếng sấm giữa đêm","Cầu vồng"],"a":1,"r":"24:27"},{"n":239,"ch":"CHƯƠNG 24","q":"Chúa phán Con Người sẽ ngự đến trên:","o":["Các đám mây trên trời","Đỉnh đền thờ","Núi Si-ôn","Núi Ô-li-ve"],"a":0,"r":"24:30"},{"n":240,"ch":"CHƯƠNG 24","q":"Chúa dùng hình ảnh nào để dạy biết mùa hạ gần đến?","o":["Hoa huệ ngoài đồng","Chim én bay về","Cây vả đâm lá","Gà gáy"],"a":2,"r":"24:32"},{"n":241,"ch":"CHƯƠNG 24","q":"Chúa so sánh ngày Con Người đến với thời của ai?","o":["Nô-ê","Môi-se","Áp-ra-ham","Giô-na"],"a":0,"r":"24:37-39"},{"n":242,"ch":"CHƯƠNG 24","q":"“Hãy tỉnh thức, vì các ngươi không biết…”","o":["Năm nào đền thờ sẽ đổ","Ngày nào Chúa các ngươi đến","Giờ nào Giăng sẽ trở lại","Tháng nào đền thờ bị phá"],"a":1,"r":"24:42"},{"n":243,"ch":"CHƯƠNG 24","q":"Nếu chủ nhà biết canh nào kẻ trộm sẽ đến thì ông sẽ:","o":["Giấu hết của cải","Ngủ ngon","Thức canh, không để nó khoét vách nhà","Mở cửa mời nó vào"],"a":2,"r":"24:43"},{"n":244,"ch":"CHƯƠNG 24","q":"Chúa gọi đầy tớ nào là có phước khi chủ trở về?","o":["Đầy tớ trung tín và khôn ngoan đang làm đúng bổn phận","Đầy tớ ngủ say","Đầy tớ ăn uống với bạn say sưa","Đầy tớ vắng mặt"],"a":0,"r":"24:45-46"},{"n":245,"ch":"CHƯƠNG 25","q":"Mười người nữ đồng trinh cầm đèn ra đón ai?","o":["Vua","Chàng rể","Chủ nhà","Thầy tế lễ"],"a":1,"r":"25:1"},{"n":246,"ch":"CHƯƠNG 25","q":"Năm người dại cầm đèn nhưng quên mang theo gì?","o":["Bánh","Diêm","Dầu","Rượu"],"a":2,"r":"25:3"},{"n":247,"ch":"CHƯƠNG 25","q":"Tiếng kêu “Chàng rể kia rồi, hãy ra đón” vang lên vào lúc nào?","o":["Nửa đêm","Sáng sớm","Hoàng hôn","Giữa trưa"],"a":0,"r":"25:6"},{"n":248,"ch":"CHƯƠNG 25","q":"Kết luận của dụ ngôn mười người nữ đồng trinh là:","o":["Hãy dâng của lễ","Hãy tỉnh thức, vì không biết ngày giờ","Hãy kiêng ăn","Hãy thờ phượng Đức Chúa Trời"],"a":1,"r":"25:13"},{"n":249,"ch":"CHƯƠNG 25","q":"Chủ giao cho ba đầy tớ lần lượt bao nhiêu ta-lâng?","o":["Mười, năm và một","Ba, ba và ba","Năm, hai và một","Tám, hai và một"],"a":2,"r":"25:15"},{"n":250,"ch":"CHƯƠNG 25","q":"Đầy tớ nhận một ta-lâng đã làm gì?","o":["Cho vay lấy lãi","Chôn dưới đất","Tiêu xài","Trao cho người khác"],"a":1,"r":"25:18"},{"n":251,"ch":"CHƯƠNG 25","q":"Chủ khen đầy tớ trung tín:","o":["“Ngươi đã làm việc rất nhanh”","“Ngươi là đầy tớ khôn ngoan nhất”","“Ngươi đã trung tín trong việc nhỏ, ta sẽ lập ngươi coi sóc nhiều việc”","“Ngươi đã làm thật tốt, ta sẽ cho ngươi nghỉ”"],"a":2,"r":"25:21"},{"n":252,"ch":"CHƯƠNG 25","q":"Chủ gọi người đầy tớ đã chôn ta-lâng là:","o":["Độc ác và biếng nhác","Giả dối và gian tham","Ngu dại và hèn nhát","Gian dối và trộm cắp"],"a":0,"r":"25:26"},{"n":253,"ch":"CHƯƠNG 25","q":"Con Người sẽ chia các dân như người chăn chia:","o":["Chiên với dê","Lúa với cỏ lùng","Bò với lừa","Lúa mì với trấu"],"a":0,"r":"25:32"},{"n":254,"ch":"CHƯƠNG 25","q":"Chiên được đặt ở bên nào của Con Người?","o":["Bên tả","Bên hữu","Phía sau","Phía trước"],"a":1,"r":"25:33"},{"n":255,"ch":"CHƯƠNG 25","q":"Việc nào KHÔNG được Chúa nhắc là điều làm cho “kẻ rất nhỏ” (25:35-36)?","o":["Thăm người bị tù","Cho người khát uống nước","Dâng một phần mười","Tiếp rước khách lạ"],"a":2,"r":"25:35-36. Chúa nhắc: cho ăn, cho uống, tiếp khách lạ, mặc áo, thăm bệnh, thăm tù."},{"n":256,"ch":"CHƯƠNG 25","q":"Chúa phán những việc làm cho một người rất nhỏ trong anh em Ngài là:","o":["Làm cho chính Ngài","Làm cho Đa-vít","Làm cho thiên sứ","Làm cho Môi-se"],"a":0,"r":"25:40"},{"n":257,"ch":"CHƯƠNG 26","q":"Chúa báo trước còn mấy ngày nữa đến lễ Vượt-qua, khi Con Người sẽ bị nộp để đóng đinh?","o":["Ba ngày","Hai ngày","Một tuần","Năm ngày"],"a":1,"r":"26:2"},{"n":258,"ch":"CHƯƠNG 26","q":"Thầy tế lễ thượng phẩm lúc ấy tên là gì?","o":["Ni-cô-đem","A-ne","Cai-phe","Ga-ma-li-ên"],"a":2,"r":"26:3"},{"n":259,"ch":"CHƯƠNG 26","q":"Ở Bê-tha-ni, Chúa ngồi ăn trong nhà ai?","o":["Si-môn người phung","La-xa-rơ","Ma-thê","Si-môn Phi-e-rơ"],"a":0,"r":"26:6"},{"n":260,"ch":"CHƯƠNG 26","q":"Người đàn bà đổ dầu thơm quý giá lên phần nào của Chúa?","o":["Chân Chúa","Đầu Chúa","Tay Chúa","Vai Chúa"],"a":1,"r":"26:7. Giăng 12:3 ghi Ma-ri xức chân Chúa."},{"n":261,"ch":"CHƯƠNG 26","q":"Giu-đa Ích-ca-ri-ốt đồng ý nộp Chúa cho các thầy tế lễ cả với giá bao nhiêu?","o":["Mười miếng bạc","Ba mươi nén vàng","Ba mươi miếng bạc","Hai mươi miếng bạc"],"a":2,"r":"26:15"},{"n":262,"ch":"CHƯƠNG 26","q":"Trong bữa Lễ Vượt-qua, Chúa nói điều gì khiến các môn đồ buồn rầu?","o":["Một người trong mười hai sẽ phản Ngài","Ngài sẽ sớm lên trời","Ngài sẽ trở về Ga-li-lê","Một người trong họ sẽ bị bắt"],"a":0,"r":"26:21"},{"n":263,"ch":"CHƯƠNG 26","q":"Khi bẻ bánh, Chúa phán: “Hãy lấy ăn đi, nầy là…”","o":["Của lễ Vượt-qua","Thân thể Ta","Bánh sự sống","Huyết Ta"],"a":1,"r":"26:26"},{"n":264,"ch":"CHƯƠNG 26","q":"Chúa phán chén nầy là:","o":["Rượu mới của nước thiên đàng","Huyết của Vượt-qua","Huyết của giao ước, vì nhiều người đổ ra để tha tội","Rượu của tiệc cưới"],"a":2,"r":"26:28"},{"n":265,"ch":"CHƯƠNG 26","q":"Chúa nói Phi-e-rơ sẽ chối Ngài ba lần trước khi:","o":["Mặt trời mọc","Lễ Vượt-qua kết thúc","Gà gáy","Đêm xuống"],"a":2,"r":"26:34"},{"n":266,"ch":"CHƯƠNG 26","q":"Chúa đến cầu nguyện ở nơi nào?","o":["Giê-ri-cô","Ghết-sê-ma-nê","Bê-tha-ni","Núi Hẹt-môn"],"a":1,"r":"26:36"},{"n":267,"ch":"CHƯƠNG 26","q":"Chúa dẫn ba môn đồ nào vào sâu trong vườn để cầu nguyện cùng Ngài?","o":["Phi-e-rơ và hai con trai Xê-bê-đê","Phi-e-rơ, Anh-rê và Phi-líp","Gia-cơ, Giăng và Thô-ma","Phi-e-rơ, Phi-líp và Ba-thê-lê-my"],"a":0,"r":"26:37"},{"n":268,"ch":"CHƯƠNG 26","q":"Chúa phán với môn đồ về linh hồn Ngài:","o":["Buồn bực cho đến chết","Rất vui mừng","Bình an trọn vẹn","Hoan hỉ cho đến chết"],"a":0,"r":"26:38"},{"n":269,"ch":"CHƯƠNG 26","q":"Trong lời cầu nguyện, Chúa xin điều gì?","o":["Xin sai thiên sứ đến giải cứu","Nếu có thể được, xin cho chén nầy lìa khỏi Con; song không theo ý Con, mà theo ý Cha","Xin cất mọi nỗi khổ khỏi Con","Xin các môn đồ cùng chết với Ngài"],"a":1,"r":"26:39"},{"n":270,"ch":"CHƯƠNG 26","q":"Chúa cảnh tỉnh môn đồ: “Tâm thần thì sẵn lòng, nhưng…”","o":["Con mắt thì mờ","Đức tin thì nhỏ","Xác thịt thì yếu đuối","Lòng thì giả dối"],"a":2,"r":"26:41"},{"n":271,"ch":"CHƯƠNG 26","q":"Chúa cầu nguyện ở Ghết-sê-ma-nê bao nhiêu lần?","o":["Ba lần","Bảy lần","Hai lần","Năm lần"],"a":0,"r":"26:39-44"},{"n":272,"ch":"CHƯƠNG 26","q":"Giu-đa dùng dấu hiệu nào để chỉ cho đám đông biết ai là Chúa Giê-xu?","o":["Chỉ tay vào Ngài","Hôn Ngài","Gọi tên Ngài","Vái chào Ngài"],"a":1,"r":"26:48-49"},{"n":273,"ch":"CHƯƠNG 26","q":"Khi Phi-e-rơ rút gươm chém, Chúa phán:","o":["Hãy chém thêm","Hãy cầm gươm cho chắc","Hãy nạp gươm vào vỏ; ai cầm gươm sẽ bị chết vì gươm","Hãy rút gươm thêm"],"a":2,"r":"26:52"},{"n":274,"ch":"CHƯƠNG 26","q":"Chúa phán Ngài có thể xin Cha cấp cho hơn bao nhiêu đạo thiên sứ?","o":["Bảy đạo","Mười đạo","Mười hai đạo","Hai mươi đạo"],"a":2,"r":"26:53"},{"n":275,"ch":"CHƯƠNG 26","q":"Sau khi chối Chúa lần thứ ba và nghe tiếng gà gáy, Phi-e-rơ đã làm gì?","o":["Bỏ trốn về Ga-li-lê","Đi ra ngoài và khóc lóc đắng cay","Ở lại sân đến sáng","Chạy vào đền thờ"],"a":1,"r":"26:75"},{"n":276,"ch":"CHƯƠNG 27","q":"Sáng sớm, các thầy tế lễ cả và trưởng lão giải Chúa Giê-xu đến nộp cho ai?","o":["Tổng đốc Phi-lát","Cai-phe","Vua Hê-rốt","Thầy tế lễ A-ne"],"a":0,"r":"27:1-2"},{"n":277,"ch":"CHƯƠNG 27","q":"Khi thấy Chúa bị kết án, Giu-đa đã làm gì?","o":["Xin Phi-lát tha cho Chúa","Trốn về Ga-li-lê","Ăn năn, trả lại ba mươi bạc rồi thắt cổ","Chạy đi tìm Chúa"],"a":2,"r":"27:3-5"},{"n":278,"ch":"CHƯƠNG 27","q":"Ai nhắn Phi-lát: “Đừng nhúng vào việc người công chính ấy” vì đã chịu khổ trong chiêm bao?","o":["Vợ của Hê-rốt","Vợ của Phi-lát","Mẹ của Phi-lát","Con gái Phi-lát"],"a":1,"r":"27:19. Chi tiết nầy chỉ có trong Ma-thi-ơ."},{"n":279,"ch":"CHƯƠNG 27","q":"Để tỏ mình vô tội về huyết của Chúa, Phi-lát đã:","o":["Lấy nước rửa tay trước mặt đám đông","Thả Chúa ngay","Xé áo mình","Ra lệnh đánh Chúa"],"a":0,"r":"27:24"},{"n":280,"ch":"CHƯƠNG 27","q":"Quân lính đội lên đầu Chúa Giê-xu cái gì?","o":["Mão bằng vàng","Mão bằng lá ô-liu","Mão bằng gai","Mão bằng bạc"],"a":2,"r":"27:29"},{"n":281,"ch":"CHƯƠNG 27","q":"Ai bị lính bắt vác thập tự giá của Chúa?","o":["Ni-cô-đem","Si-môn người Sy-ren","Giô-sép A-ri-ma-thê","A-lết-xan-đơ"],"a":1,"r":"27:32"},{"n":282,"ch":"CHƯƠNG 27","q":"Gô-gô-tha có nghĩa là gì?","o":["Nơi cái sọ","Vườn dầu","Đồi sọ đá","Núi dầu"],"a":0,"r":"27:33"},{"n":283,"ch":"CHƯƠNG 27","q":"Tấm bảng treo trên đầu Chúa ghi:","o":["Con Đức Chúa Trời","Giê-xu người Na-xa-rét","Người nầy là Giê-xu, Vua dân Giu-đa","Con Đa-vít"],"a":2,"r":"27:37"},{"n":284,"ch":"CHƯƠNG 27","q":"Hai bên Chúa Giê-xu bị đóng đinh cùng với:","o":["Hai tên cướp","Hai thầy thông giáo","Hai lính La-mã","Hai thầy tế lễ"],"a":0,"r":"27:38"},{"n":285,"ch":"CHƯƠNG 27","q":"Từ giờ thứ sáu đến giờ thứ chín, điều gì xảy ra khắp xứ?","o":["Động đất","Tối tăm","Mưa đá","Gió lớn"],"a":1,"r":"27:45"},{"n":286,"ch":"CHƯƠNG 27","q":"Khoảng giờ thứ chín, Chúa kêu lớn tiếng: “Đức Chúa Trời tôi ơi, Đức Chúa Trời tôi ơi…”","o":["Xin nhận linh hồn tôi","Xin tha cho họ","Sao Ngài lìa bỏ tôi?","Hãy cứu con khỏi cơn thịnh nộ"],"a":2,"r":"27:46"},{"n":287,"ch":"CHƯƠNG 27","q":"Khi Chúa trút linh hồn, màn trong đền thờ đã:","o":["Cháy thành tro","Xé làm hai từ trên chí dưới","Rơi xuống đất","Treo lên cao hơn"],"a":1,"r":"27:51"},{"n":288,"ch":"CHƯƠNG 27","q":"Khi Chúa chết, những mồ mả mở ra và điều gì xảy ra?","o":["Nhiều thánh đồ đã ngủ được sống lại","Đền thờ sụp đổ","Các lính La-mã chạy trốn","Nhiều thiên sứ hiện ra"],"a":0,"r":"27:52"},{"n":289,"ch":"CHƯƠNG 27","q":"Viên đội trưởng và những người canh giữ nói gì khi thấy các điềm lạ?","o":["“Thật người nầy là Con Đức Chúa Trời”","“Người nầy là một tiên tri”","“Người nầy là Vua dân Giu-đa”","“Người nầy là Đấng Cứu Thế của La-mã”"],"a":0,"r":"27:54"},{"n":290,"ch":"CHƯƠNG 27","q":"Người phụ nữ nào dưới đây đứng xem từ xa khi Chúa chết?","o":["Ê-li-sa-bét","Ma-ri Ma-đơ-len","Ma-thê","Ha-na"],"a":1,"r":"27:55-56"},{"n":291,"ch":"CHƯƠNG 27","q":"Giô-sép người A-ri-ma-thê chôn Chúa Giê-xu trong:","o":["Hang đá ở Bết-lê-hem","Mồ của gia đình Đa-vít","Mồ mới của ông, đục vào đá","Hang đá của thầy tế lễ"],"a":2,"r":"27:57-60"},{"n":292,"ch":"CHƯƠNG 27","q":"Các thầy tế lễ cả xin Phi-lát canh giữ mồ vì sợ:","o":["Môn đồ đến lấy trộm xác rồi nói Ngài đã sống lại","Dân chúng nổi loạn","Lính La-mã bỏ đi","Người La-mã sẽ lấy xác"],"a":0,"r":"27:64"},{"n":293,"ch":"CHƯƠNG 28","q":"Rạng sáng ngày đầu tuần, những ai đến thăm mồ Chúa?","o":["Phi-e-rơ và Giăng","Ma-ri Ma-đơ-len và Ma-ri khác","Ma-thê và Ma-ri","Ma-thê và Sa-lô-mê"],"a":1,"r":"28:1"},{"n":294,"ch":"CHƯƠNG 28","q":"Thiên sứ lăn hòn đá ra khỏi cửa mồ rồi:","o":["Đứng canh cửa mồ","Bay về trời","Ngồi lên trên hòn đá","Đốt lửa trước mồ"],"a":2,"r":"28:2"},{"n":295,"ch":"CHƯƠNG 28","q":"Thiên sứ nói với các phụ nữ:","o":["“Ngài không ở đây; Ngài đã sống lại như lời Ngài đã phán”","“Hãy đi nói với Phi-e-rơ ở lại Giê-ru-sa-lem”","“Hãy ở lại canh mồ”","“Hãy quay về Na-xa-rét”"],"a":0,"r":"28:6"},{"n":296,"ch":"CHƯƠNG 28","q":"Thiên sứ báo Chúa Giê-xu sẽ gặp các môn đồ ở đâu?","o":["Bê-tha-ni","Ga-li-lê","Giê-ru-sa-lem","Na-xa-rét"],"a":1,"r":"28:7"},{"n":297,"ch":"CHƯƠNG 28","q":"Có bao nhiêu môn đồ đi đến núi tại Ga-li-lê?","o":["Mười hai","Bảy","Mười một","Hai mươi"],"a":2,"r":"28:16"},{"n":298,"ch":"CHƯƠNG 28","q":"Chúa phán: “Hết cả quyền phép ở trên trời và dưới đất đã giao cho Ta.” Đoạn nầy là lời mở đầu của:","o":["Đại mạng lệnh","Bài giảng trên núi","Lời cầu nguyện của Chúa","Dụ ngôn"],"a":0,"r":"28:18"},{"n":299,"ch":"CHƯƠNG 28","q":"Trong Đại mạng lệnh, Chúa truyền dạy các dân giữ làm theo:","o":["Luật pháp Môi-se","Mọi điều Ta đã truyền cho các ngươi","Các lệ truyền khẩu","Điều các thầy thông giáo dạy"],"a":1,"r":"28:20"},{"n":300,"ch":"CHƯƠNG 28","q":"Chúa hứa với các môn đồ ở cuối sách Ma-thi-ơ:","o":["Ta sẽ sai thiên sứ giúp","Ta sẽ trở lại ngay","Ta ở cùng các ngươi luôn cho đến tận thế","Ta sẽ ở lại trong đền thờ"],"a":2,"r":"28:20. Gần với tên Em-ma-nu-ên ở 1:23: sách mở đầu và kết thúc cùng một ý."}];
+const EXAM_SIZE = 30;
+const PASS_MARK = 20;
+
+/* ---------- safe storage ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* ---------- helpers ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function rnd(n){
+  if (window.crypto && crypto.getRandomValues){
+    const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n;
+  }
+  return Math.floor(Math.random() * n);
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){ const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function pick(arr){ return arr[rnd(arr.length)]; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+const LETTERS = ["A","B","C","D"];
+
+/* ---------- roast bank ---------- */
+const GOOD = [
+  "Ồ, biết thật hả? Tưởng bốc thăm.",
+  "Đúng rồi. Đừng vội mừng, mù còn có lúc trúng.",
+  "Một cú đúng hiếm hoi. Ghi sổ lại.",
+  "Chắc là may. Làm thêm câu nữa cho tôi tin.",
+  "Đúng. Câu dễ vậy mà mừng thì hơi sớm đó {n}.",
+  "Có vẻ não vẫn còn kết nối mạng.",
+  "Đúng. Thầy giáo suýt rơi nước mắt, vì bất ngờ.",
+  "Tạm được. Mức “không đến nỗi tệ”.",
+  "Đúng! Nhưng đừng kiêu ngạo, tự cao đi trước sự sa ngã.",
+  "{n} biết thật hay đoán trúng? Thôi kệ, vẫn tính.",
+  "Có người lén học bài hôm qua rồi đây.",
+  "Đúng. Cho một cái gật đầu miễn cưỡng.",
+  "Xác suất có 25% mà cũng khoe được.",
+  "Đỉnh. Theo chuẩn của người vừa sai hồi nãy.",
+  "Đúng. Lần này thôi nhé.",
+  "Hiếm có khó tìm. Ai đó tặng {n} một cái huy chương nhựa đi."
+];
+const BAD = [
+  "Sai bét. Câu này mà cũng sai thì tôi cạn lời.",
+  "Trời ơi {n}, đáp án nằm sờ sờ ra đó.",
+  "Chọn kiểu này thì tung đồng xu còn chuẩn hơn.",
+  "Phi-e-rơ chối Chúa ba lần, còn {n} chối đáp án đúng cả buổi.",
+  "Sai. Cuốn Kinh Thánh dùng để kê gối ngủ đúng không?",
+  "Mắt nhìn đề mà não đi vắng.",
+  "Đáp án đúng đang buồn vì bị {n} ngó lơ.",
+  "Sai. Khuyên đọc lại từ chương 1.",
+  "{n} bấm cho vui hả? Nhìn là biết.",
+  "Sai. Tôi vẫn tin bạn… à thôi, hết tin rồi.",
+  "Một màn trình diễn đáng xấu hổ.",
+  "Gà gáy rồi kìa, sai thêm một câu nữa.",
+  "Thầy đã cố nhịn cười nhưng không nổi.",
+  "Bạn đang đi ngược chiều với sự thật đấy.",
+  "Thi thật mà làm vậy thì nhớ mang khăn lau nước mắt.",
+  "Khoanh bừa đúng không? Nhìn đã thấy mùi bừa.",
+  "Tay nhanh hơn não. Rõ ràng.",
+  "Con lừa của Ba-la-am còn nhìn ra, {n} thì chưa.",
+  "Chiên lạc còn có người đi tìm, {n} thì thôi.",
+  "Đề cương 300 câu mà ôn kiểu này thì phí giấy in.",
+  "Sai. Bạn vừa làm đáp án đúng cảm thấy bị xúc phạm.",
+  "Ôi không. Ôi trời. Ôi {n}."
+];
+const STREAK_GOOD = {3:"3 câu liên tiếp? Hôm nay mặt trời mọc đằng Tây à?",5:"5 câu liền! Khoan, có gian lận không đấy?",10:"10 câu liền! Thôi đủ rồi, đừng làm tôi sợ.",15:"15 câu liền. Bạn là người hay là bản đề cương biết đi?"};
+const STREAK_BAD = {3:"3 câu sai liên tiếp. Hay mình đóng tab đi?",5:"5 câu sai liền. Làm có chủ đích đúng không?",8:"8 câu sai liền. Thành tích này đáng vào sách kỷ lục.",12:"12 câu sai liền. Tôi bắt đầu thấy ngưỡng mộ sự kiên định này."};
+const TIERS = [
+  {min:30,title:"Thánh sống",txt:"Điểm tuyệt đối. Hoặc là thuộc cả đề cương, hoặc là lén mở sách. Tôi nghiêng về vế sau."},
+  {min:27,title:"Giỏi, nhưng chưa đủ",txt:"Thiếu vài câu thôi. Vừa đủ để bị ghét, chưa đủ để được tôn thờ."},
+  {min:24,title:"Khá ổn",txt:"Cũng được. Nhưng đừng vội ngạo mạn, ngày mai đề khác."},
+  {min:20,title:"Đậu lẹt đẹt",txt:"Qua được, chưa đủ để khoe với ai. Mức an toàn của người ôn nửa vời."},
+  {min:15,title:"Nửa nạc nửa mỡ",txt:"Lên không tới, xuống cũng không xong. Đọc lại các câu sai bên dưới đi."},
+  {min:10,title:"Ôn bài hay ôn nhạc?",txt:"Thành tích này là một nỗi buồn có thật. Cuốn đề cương đang khóc ở góc nhà."},
+  {min:5,title:"Thảm họa nhẹ",txt:"Thầy giáo xem điểm xong phải ngồi xuống uống nước. Làm lại ngay cho đỡ nhục."},
+  {min:0,title:"Chiên lạc chính hiệu",txt:"Ít nhất bạn nhất quán: sai gần hết. Mở đề cương ra đọc rồi quay lại, tôi đợi."}
+];
+
+/* ---------- sound ---------- */
+let audioCtx = null;
+let soundOn = store.get("mt_sound", true);
+function beep(freqs, dur=.12, type="sine", vol=.08){
+  if (!soundOn) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    let t = audioCtx.currentTime;
+    freqs.forEach(f => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t + dur);
+      t += dur * .85;
+    });
+  }catch(e){}
+}
+const sfxGood = () => beep([660, 880, 1100], .11, "triangle");
+const sfxBad = () => beep([220, 165, 110], .16, "sawtooth", .06);
+function renderSound(){
+  const b = $("#snd");
+  b.textContent = "Âm thanh: " + (soundOn ? "bật" : "tắt");
+  b.setAttribute("aria-pressed", String(soundOn));
+}
+$("#snd").addEventListener("click", () => { soundOn = !soundOn; store.set("mt_sound", soundOn); renderSound(); });
+renderSound();
+
+/* ---------- effects ---------- */
+const cv = $("#fx"), cx = cv.getContext("2d");
+let parts = [], raf = 0;
+function sizeCanvas(){ cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+addEventListener("resize", sizeCanvas); sizeCanvas();
+function confetti(x, y){
+  if (reduceMotion) return;
+  const colors = ["#14804f","#ffe45e","#d7263d","#2d5bd6","#ff8a3d","#8a4bd6"];
+  for (let i = 0; i < 70; i++){
+    const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 9;
+    parts.push({x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 6, g: .32, r: 4 + Math.random() * 5,
+      c: pick(colors), rot: Math.random() * 6, vr: (Math.random() - .5) * .4, life: 70 + Math.random() * 40});
+  }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, cv.width, cv.height);
+  const k = devicePixelRatio;
+  parts = parts.filter(p => p.life-- > 0);
+  parts.forEach(p => {
+    p.vy += p.g; p.x += p.vx; p.y += p.vy; p.vx *= .985; p.rot += p.vr;
+    cx.save(); cx.translate(p.x * k, p.y * k); cx.rotate(p.rot);
+    cx.fillStyle = p.c; cx.globalAlpha = Math.min(1, p.life / 25);
+    cx.fillRect(-p.r * k, -p.r * k * .5, p.r * 2 * k, p.r * k); cx.restore();
+  });
+  raf = parts.length ? requestAnimationFrame(tick) : 0;
+  if (!raf) cx.clearRect(0, 0, cv.width, cv.height);
+}
+function disaster(){
+  if (navigator.vibrate) { try{ navigator.vibrate(180); }catch(e){} }
+  if (reduceMotion) return;
+  document.body.classList.remove("shake"); void document.body.offsetWidth; document.body.classList.add("shake");
+  const f = document.createElement("div"); f.className = "flash"; document.body.appendChild(f);
+  setTimeout(() => f.remove(), 600);
+  const em = ["🤡","💀","🤦","😭","🐑","📉","🙈"];
+  for (let i = 0; i < 12; i++){
+    const e = document.createElement("div"); e.className = "rain"; e.textContent = pick(em);
+    e.style.left = (Math.random() * 94) + "vw"; e.style.animationDelay = (Math.random() * .5) + "s";
+    document.body.appendChild(e); setTimeout(() => e.remove(), 2400);
+  }
+}
+
+/* ---------- exam picking ---------- */
+function buildExam(){
+  const seen = new Set(store.get("mt_seen", []));
+  let unseen = Q.filter(q => !seen.has(q.n));
+  let chosen;
+  if (unseen.length >= EXAM_SIZE){
+    chosen = shuffle(unseen).slice(0, EXAM_SIZE);
+  } else {
+    chosen = unseen.slice();
+    const rest = shuffle(Q.filter(q => !chosen.includes(q))).slice(0, EXAM_SIZE - chosen.length);
+    chosen = chosen.concat(rest);
+    seen.clear(); // 300 câu đã quay đủ vòng, bắt đầu vòng mới
+    rest.forEach(q => seen.add(q.n));
+    store.set("mt_seen", [...seen]);
+    return finalize(chosen);
+  }
+  chosen.forEach(q => seen.add(q.n));
+  store.set("mt_seen", [...seen]);
+  return finalize(chosen);
+}
+function finalize(list){
+  return shuffle(list).map(q => ({
+    n: q.n, ch: q.ch, q: q.q, r: q.r,
+    opts: shuffle(q.o.map((t, i) => ({t, ok: i === q.a})))
+  }));
+}
+function viewedCount(){ return (store.get("mt_seen", [])).length; }
+
+/* ---------- state ---------- */
+let name = store.get("mt_name", "");
+let exam = [], idx = 0, score = 0, results = [], goodStreak = 0, badStreak = 0, examId = "", locked = false;
+
+function who(){
+  $("#who").innerHTML = name ? "Thí sinh: <b>" + esc(name) + "</b>" : "";
+}
+function nm(){ return name || "bạn"; }
+function say(t){ return t.replace(/\{n\}/g, nm()); }
+
+/* ---------- screens ---------- */
+function showLogin(){
+  who();
+  const seenN = viewedCount();
+  $("#app").innerHTML = `
+    <h1 class="title">Thi Ma-thi-ơ</h1><br>
+    <p class="sub">30 câu ngẫu nhiên từ đề cương 300 câu. Sai là bị chấm bút đỏ.</p>
+    <form id="lf" autocomplete="off">
+      <label class="field"><span>Tên thí sinh</span>
+        <input id="nm" maxlength="20" placeholder="Nhập tên để bị gọi cho đúng" value="${esc(name)}" required>
+      </label>
+      <button class="btn" type="submit">Vào thi</button>
+    </form>
+    <ul class="rules">
+      <li>Mỗi lần vào thi là một đề mới, ưu tiên câu bạn chưa gặp.</li>
+      <li>Chọn xong là biết đúng hay sai ngay, không sửa được.</li>
+      <li>Phím A, B, C, D (hoặc 1 đến 4) để chọn, Enter để qua câu.</li>
+      ${seenN ? `<li>Bạn đã gặp ${Math.min(seenN,300)}/300 câu trong vòng này.</li>` : ""}
+    </ul>`;
+  const inp = $("#nm"); inp.focus();
+  $("#lf").addEventListener("submit", e => {
+    e.preventDefault();
+    name = inp.value.trim().slice(0, 20) || "bạn";
+    store.set("mt_name", name);
+    startExam();
+  });
+}
+
+function startExam(){
+  exam = buildExam(); idx = 0; score = 0; results = []; goodStreak = 0; badStreak = 0;
+  examId = String(1000 + rnd(9000));
+  who(); showQuestion();
+}
+
+function scoreRow(){
+  let h = "";
+  for (let i = 0; i < exam.length; i++){
+    const r = results[i];
+    const cls = r === undefined ? (i === idx ? "now" : "") : (r ? "ok" : "no");
+    h += `<div class="cell ${cls}" aria-hidden="true">${r === undefined ? "" : (r ? "✓" : "✗")}</div>`;
+  }
+  return `<div class="score-row" role="img" aria-label="Đã làm ${results.length}/${exam.length} câu, đúng ${score}">${h}</div>`;
+}
+
+function showQuestion(){
+  locked = false;
+  const q = exam[idx];
+  const chap = q.ch === "TỔNG QUAN SÁCH MA-THI-Ơ" ? "Tổng quan sách" : q.ch.replace("CHƯƠNG", "Chương");
+  $("#app").innerHTML = `
+    ${scoreRow()}
+    <div class="meta"><span>Câu ${idx + 1}/${exam.length} · đề số ${examId}</span><span>${esc(chap)} · đúng ${score}</span></div>
+    <h2 class="q">${esc(q.q)}</h2>
+    <div class="opts" id="opts">
+      ${q.opts.map((o, i) => `<button class="opt" type="button" data-i="${i}"><span class="key">${LETTERS[i]}</span><span class="t">${esc(o.t)}</span></button>`).join("")}
+    </div>
+    <div class="fb" id="fb" hidden></div>
+    <div class="next" id="nx" hidden></div>`;
+  $("#opts").addEventListener("click", e => {
+    const b = e.target.closest(".opt"); if (b) choose(+b.dataset.i, e);
+  });
+  window.scrollTo({top: 0, behavior: reduceMotion ? "auto" : "smooth"});
+}
+
+function choose(i, ev){
+  if (locked) return; locked = true;
+  const q = exam[idx];
+  const ok = q.opts[i].ok;
+  results[idx] = ok;
+  if (ok){ score++; goodStreak++; badStreak = 0; } else { badStreak++; goodStreak = 0; }
+
+  document.querySelectorAll(".opt").forEach((b, k) => {
+    b.disabled = true;
+    if (q.opts[k].ok) b.classList.add("right");
+    else if (k === i) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+
+  let line = say(pick(ok ? GOOD : BAD));
+  const st = ok ? STREAK_GOOD[goodStreak] : STREAK_BAD[badStreak];
+  if (st) line = st;
+  const ref = q.r ? `<div class="ref">Đối chiếu: ${esc(q.r)}</div>` : "";
+  const fb = $("#fb");
+  fb.hidden = false;
+  fb.innerHTML = `<div class="stamp ${ok ? "ok" : "no"}">${ok ? "ĐÚNG" : "SAI"}</div><div class="note pen">${esc(line)}</div>${ref}`;
+  const nx = $("#nx"); nx.hidden = false;
+  const last = idx === exam.length - 1;
+  nx.innerHTML = `<button class="btn" id="go" type="button">${last ? "Nộp bài, xem điểm" : "Câu tiếp"}</button>`;
+  $("#go").addEventListener("click", next);
+  $("#go").focus({preventScroll: true});
+  fb.scrollIntoView({block: "nearest", behavior: reduceMotion ? "auto" : "smooth"});
+
+  // refresh score row
+  $(".score-row").outerHTML = scoreRow();
+
+  if (ok){
+    sfxGood();
+    const r = (ev && ev.target && ev.target.getBoundingClientRect) ? ev.target.getBoundingClientRect() : null;
+    confetti(r ? r.left + Math.min(r.width, 300) / 2 : innerWidth / 2, r ? r.top : innerHeight / 3);
+  } else {
+    sfxBad(); disaster();
+  }
+}
+
+function next(){
+  if (idx < exam.length - 1){ idx++; showQuestion(); }
+  else showResult();
+}
+
+function showResult(){
+  const tier = TIERS.find(t => score >= t.min);
+  const pass = score >= PASS_MARK;
+  const wrong = exam.map((q, i) => ({q, i})).filter(x => !results[x.i]);
+  const mark = (score / exam.length * 10).toFixed(1).replace(".", ",");
+  $("#app").innerHTML = `
+    <h1 class="title">Kết quả đề số ${examId}</h1><br>
+    <p class="sub">Thí sinh ${esc(nm())}</p>
+    <div class="grade">
+      <div class="big">${score}<small>/${exam.length}</small></div>
+      <div>
+        <div class="stamp ${pass ? "ok" : "no"}" style="display:inline-block">${pass ? "ĐẠT" : "RỚT"}</div>
+      </div>
+    </div>
+    <div class="verdict pen">${esc(tier.title)} · ${mark}/10</div>
+    <p class="roast">${esc(say(tier.txt))}</p>
+    <div class="btns">
+      <button class="btn" id="again" type="button">Làm đề mới</button>
+      <button class="btn ghost" id="rename" type="button">Đổi tên thí sinh</button>
+    </div>
+    ${wrong.length ? `<details class="review" ${wrong.length <= 6 ? "open" : ""}>
+      <summary>Xem lại ${wrong.length} câu sai</summary>
+      <ul class="rv">${wrong.map(({q, i}) => {
+        const right = q.opts.find(o => o.ok).t;
+        return `<li><b>Câu ${i + 1}.</b> ${esc(q.q)}<br><span class="ans">Đáp án đúng: ${esc(right)}</span>${q.r ? `<br><span style="color:var(--ink-soft)">${esc(q.r)}</span>` : ""}</li>`;
+      }).join("")}</ul>
+    </details>` : `<p class="pen" style="font-size:26px;background:var(--sheet);display:inline-block;padding-right:6px">Không sai câu nào. Khả nghi quá.</p>`}`;
+  $("#again").addEventListener("click", startExam);
+  $("#rename").addEventListener("click", showLogin);
+  $("#again").focus({preventScroll: true});
+  window.scrollTo({top: 0});
+  if (pass){ sfxGood(); confetti(innerWidth / 2, innerHeight / 3); confetti(innerWidth / 4, innerHeight / 2); confetti(innerWidth * .75, innerHeight / 2); }
+  else { sfxBad(); }
+}
+
+/* ---------- keyboard ---------- */
+addEventListener("keydown", e => {
+  if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  const opts = document.querySelectorAll(".opt");
+  if (opts.length && !locked){
+    let i = "abcd".indexOf(k); if (i < 0) i = "1234".indexOf(k);
+    if (i >= 0 && i < opts.length){ e.preventDefault(); opts[i].click(); return; }
+  }
+  if (locked && (k === "enter" || k === " ")){
+    const go = $("#go"); if (go && document.activeElement !== go){ e.preventDefault(); go.click(); }
+  }
+});
+
+showLogin();
+</script>
+</body>
+</html>
